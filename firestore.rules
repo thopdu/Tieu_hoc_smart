@@ -1,0 +1,53 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'grade', 'totalPoints']) &&
+             data.uid is string &&
+             data.displayName is string &&
+             data.displayName.size() <= 100 &&
+             data.grade >= 1 && data.grade <= 5 &&
+             data.totalPoints is int;
+    }
+
+    function isValidExamResult(data) {
+      return data.keys().hasAll(['userId', 'subject', 'score', 'completedAt']) &&
+             data.userId == request.auth.uid &&
+             data.subject is string &&
+             data.score is int &&
+             data.completedAt is int;
+    }
+
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false; // Profiles are private
+      allow create: if isOwner(userId) && isValidUserProfile(request.resource.data);
+      allow update: if isOwner(userId) && 
+                      isValidUserProfile(request.resource.data) &&
+                      request.resource.data.diff(resource.data).affectedKeys().hasAny(['displayName', 'grade', 'totalPoints', 'badges']);
+    }
+
+    match /results/{resultId} {
+      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && isValidExamResult(request.resource.data);
+      allow update, delete: if false; // Results are immutable
+    }
+  }
+}

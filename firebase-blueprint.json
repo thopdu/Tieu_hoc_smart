@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "Hồ sơ học sinh",
+      "description": "Thông tin cá nhân và thành tích của học sinh",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "grade": { "type": "integer", "enum": [1, 2, 3, 4, 5] },
+        "totalPoints": { "type": "integer" },
+        "badges": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "integer" }
+      },
+      "required": ["uid", "displayName", "grade", "totalPoints"]
+    },
+    "ExamResult": {
+      "title": "Kết quả luyện tập",
+      "description": "Lưu trữ điểm số sau mỗi phiên ôn tập",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "grade": { "type": "integer" },
+        "score": { "type": "integer" },
+        "totalQuestions": { "type": "integer" },
+        "correctCount": { "type": "integer" },
+        "timeSpent": { "type": "integer" },
+        "completedAt": { "type": "integer" }
+      },
+      "required": ["userId", "subject", "score", "completedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "Thông tin học sinh"
+    },
+    "/results/{resultId}": {
+      "schema": "ExamResult",
+      "description": "Kết quả làm bài"
+    }
+  }
+}

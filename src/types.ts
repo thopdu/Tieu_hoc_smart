@@ -1,6 +1,6 @@
 export type Grade = 1 | 2 | 3 | 4 | 5;
 
-export type Subject = "Toán" | "Tiếng Việt";
+export type Subject = "Toán" | "Tiếng Việt" | "Tiếng Anh";
 
 export type QuestionType = "multiple_choice" | "fill_in_blank" | "drag_drop" | "matching";
 

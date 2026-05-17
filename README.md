@@ -3,9 +3,9 @@
 Website ôn tập dành cho học sinh tiểu học Việt Nam (Lớp 1-5) theo chương trình "Kết nối tri thức và cuộc sống". Tích hợp AI để sinh đề bài tự động.
 
 ## 🚀 Tính năng nổi bật
-- **AI Question Generation**: Tự động tạo câu hỏi Toán & Tiếng Việt bám sát chương trình.
+- **AI Question Generation**: Tự động tạo câu hỏi Toán, Tiếng Việt & Tiếng Anh bám sát chương trình.
 - **Practice Modes**: 
-  - Ôn tập theo chuyên đề (Toán).
+  - Ôn tập theo chuyên đề (Toán & Tiếng Anh).
   - Ôn tập học kỳ (25 câu, phân bổ độ khó 30/40/30).
   - Luyện tập thông thường.
 - **Gamification**: Bảng xếp hạng, điểm XP, huy hiệu thành tích.

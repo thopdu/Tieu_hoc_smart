@@ -11,6 +11,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
 
   const mathTopics = ["Phép cộng, phép trừ", "Phép nhân, phép chia", "Hình học & Đo lường", "Bài toán có lời văn", "Số học & So sánh"];
+  const englishTopics = ["Vocabulary (Từ vựng)", "Grammar (Ngữ pháp)", "Reading (Đọc hiểu)", "Listening (Nghe hiểu)", "Phonics (Phát âm)"];
 
   const startNormal = (grade: Grade, subject: Subject) => {
     onStart({
@@ -32,10 +33,10 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
     });
   };
 
-  const startTopic = (grade: Grade, topic: string) => {
+  const startTopic = (grade: Grade, subject: Subject, topic: string) => {
     onStart({
       grade,
-      subject: "Toán",
+      subject,
       mode: "topic_focus",
       topic,
       count: 10,
@@ -140,7 +141,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                 className="space-y-10"
               >
                 {/* Subject Cards */}
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <div 
                     onClick={() => startNormal(selectedGrade, "Toán")}
                     className="p-6 rounded-3xl bg-orange-50 border border-orange-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-orange-200 transition-all"
@@ -160,6 +161,17 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                     <div>
                       <h4 className="font-bold text-blue-700 text-xl font-display">Tiếng Việt</h4>
                       <p className="text-sm text-blue-600 font-medium">Luyện đọc và viết Lớp {selectedGrade}</p>
+                    </div>
+                  </div>
+
+                  <div 
+                    onClick={() => startNormal(selectedGrade, "Tiếng Anh")}
+                    className="p-6 rounded-3xl bg-pink-50 border border-pink-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-pink-200 transition-all"
+                  >
+                    <div className="w-16 h-16 bg-pink-500 rounded-2xl flex items-center justify-center text-3xl text-white shadow-pink-100 shadow-md group-hover:scale-110 transition-transform">🔤</div>
+                    <div>
+                      <h4 className="font-bold text-pink-700 text-xl font-display">Tiếng Anh</h4>
+                      <p className="text-sm text-pink-600 font-medium">Luyện từ vựng và câu Lớp {selectedGrade}</p>
                     </div>
                   </div>
                 </div>
@@ -183,15 +195,35 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                 <section>
                   <div className="flex items-center justify-between mb-6 px-1">
                     <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                       Toán Chuyên Đề
+                       <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
                     </h3>
                   </div>
                   <div className="flex flex-wrap gap-3">
                     {mathTopics.map((topic, i) => (
                       <button 
                         key={i}
-                        onClick={() => startTopic(selectedGrade, topic)}
+                        onClick={() => startTopic(selectedGrade, "Toán", topic)}
                         className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
+                      >
+                        {topic}
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                {/* English Topics Section */}
+                <section>
+                  <div className="flex items-center justify-between mb-6 px-1">
+                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                       <BookText size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
+                    </h3>
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {englishTopics.map((topic, i) => (
+                      <button 
+                        key={i}
+                        onClick={() => startTopic(selectedGrade, "Tiếng Anh", topic)}
+                        className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-pink-500 hover:text-pink-600 transition-all shadow-sm"
                       >
                         {topic}
                       </button>

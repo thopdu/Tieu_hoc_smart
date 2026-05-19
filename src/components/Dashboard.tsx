@@ -139,7 +139,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
               variants={containerVariants}
               initial="hidden"
               animate="show"
-              className="grid grid-cols-5 gap-3"
+              className="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3"
             >
               {grades.map((grade) => (
                 <motion.button
@@ -148,7 +148,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedGrade(grade)}
-                  className={`py-4 rounded-2xl border-2 transition-all text-center font-display font-bold text-lg ${
+                  className={`py-3 md:py-4 rounded-xl md:rounded-2xl border-2 transition-all text-center font-display font-bold text-base md:text-lg ${
                     selectedGrade === grade 
                     ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm' 
                     : 'bg-white border-slate-100 text-slate-400 hover:bg-blue-50 hover:border-blue-200'
@@ -166,40 +166,40 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="space-y-10"
+                className="space-y-8 md:space-y-10"
               >
                 {/* Subject Cards */}
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   <div 
                     onClick={() => startNormal(selectedGrade, "Toán")}
-                    className="p-6 rounded-3xl bg-orange-50 border border-orange-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-orange-200 transition-all"
+                    className="p-5 md:p-6 rounded-3xl bg-orange-50 border border-orange-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-orange-200 transition-all"
                   >
-                    <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center text-3xl text-white shadow-orange-100 shadow-md group-hover:scale-110 transition-transform">➕</div>
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-orange-500 rounded-2xl flex items-center justify-center text-2xl md:text-3xl text-white shadow-orange-100 shadow-md group-hover:scale-110 transition-transform">➕</div>
                     <div>
-                      <h4 className="font-bold text-orange-700 text-xl font-display">Toán Học</h4>
-                      <p className="text-sm text-orange-600 font-medium">Bám sát chương trình Lớp {selectedGrade}</p>
+                      <h4 className="font-bold text-orange-700 text-lg md:text-xl font-display">Toán Học</h4>
+                      <p className="text-xs md:text-sm text-orange-600 font-medium opacity-80">Bám sát chương trình</p>
                     </div>
                   </div>
 
                   <div 
                     onClick={() => startNormal(selectedGrade, "Tiếng Việt")}
-                    className="p-6 rounded-3xl bg-blue-50 border border-blue-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-blue-200 transition-all"
+                    className="p-5 md:p-6 rounded-3xl bg-blue-50 border border-blue-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-blue-200 transition-all"
                   >
-                    <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center text-3xl text-white shadow-blue-100 shadow-md group-hover:scale-110 transition-transform">📖</div>
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-blue-500 rounded-2xl flex items-center justify-center text-2xl md:text-3xl text-white shadow-blue-100 shadow-md group-hover:scale-110 transition-transform">📖</div>
                     <div>
-                      <h4 className="font-bold text-blue-700 text-xl font-display">Tiếng Việt</h4>
-                      <p className="text-sm text-blue-600 font-medium">Luyện đọc và viết Lớp {selectedGrade}</p>
+                      <h4 className="font-bold text-blue-700 text-lg md:text-xl font-display">Tiếng Việt</h4>
+                      <p className="text-xs md:text-sm text-blue-600 font-medium opacity-80">Luyện đọc và viết</p>
                     </div>
                   </div>
 
                   <div 
                     onClick={() => startNormal(selectedGrade, "Tiếng Anh")}
-                    className="p-6 rounded-3xl bg-pink-50 border border-pink-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-pink-200 transition-all"
+                    className="p-5 md:p-6 rounded-3xl bg-pink-50 border border-pink-100 flex items-center gap-4 cursor-pointer group hover:bg-white hover:shadow-lg hover:border-pink-200 transition-all"
                   >
-                    <div className="w-16 h-16 bg-pink-500 rounded-2xl flex items-center justify-center text-3xl text-white shadow-pink-100 shadow-md group-hover:scale-110 transition-transform">🔤</div>
+                    <div className="w-14 h-14 md:w-16 md:h-16 bg-pink-500 rounded-2xl flex items-center justify-center text-2xl md:text-3xl text-white shadow-pink-100 shadow-md group-hover:scale-110 transition-transform">🔤</div>
                     <div>
-                      <h4 className="font-bold text-pink-700 text-xl font-display">Tiếng Anh</h4>
-                      <p className="text-sm text-pink-600 font-medium">Luyện từ vựng và câu Lớp {selectedGrade}</p>
+                      <h4 className="font-bold text-pink-700 text-lg md:text-xl font-display">Tiếng Anh</h4>
+                      <p className="text-xs md:text-sm text-pink-600 font-medium opacity-80">Luyện từ vựng</p>
                     </div>
                   </div>
                 </div>
@@ -207,15 +207,15 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                 {/* Semester Review Banner */}
                 <div 
                   onClick={() => startSemesterReview(selectedGrade, "Toán")}
-                  className="bg-gradient-to-r from-emerald-500 to-teal-600 p-8 rounded-[2.5rem] text-white flex items-center justify-between cursor-pointer shadow-lg hover:shadow-emerald-200 transition-all group"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-600 p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 cursor-pointer shadow-lg hover:shadow-emerald-200 transition-all group"
                 >
-                  <div>
-                    <div className="bg-white/20 w-fit px-4 py-1 rounded-full text-xs font-bold mb-3 uppercase tracking-widest">Đặc biệt</div>
-                    <h4 className="text-3xl font-black font-display mb-2">Ôn Tập Học Kỳ (Đề 10 Câu)</h4>
-                    <p className="text-emerald-50 opacity-90">Cấu trúc: Trắc nghiệm & Tự luận. Điểm số tối đa là 10.0</p>
+                  <div className="flex-1">
+                    <div className="bg-white/20 w-fit px-4 py-1 rounded-full text-[10px] font-bold mb-3 uppercase tracking-widest">Đặc biệt</div>
+                    <h4 className="text-2xl md:text-3xl font-black font-display mb-2">Ôn Tập Học Kỳ (Đề 10 Câu)</h4>
+                    <p className="text-xs md:text-sm text-emerald-50 opacity-90 leading-relaxed">Cấu trúc: Trắc nghiệm & Tự luận. Điểm số tối đa là 10.0</p>
                   </div>
-                  <div className="bg-white/20 p-5 rounded-3xl group-hover:bg-white group-hover:text-emerald-600 transition-all">
-                    <GraduationCap size={40} />
+                  <div className="bg-white/20 p-4 md:p-5 rounded-3xl group-hover:bg-white group-hover:text-emerald-600 transition-all self-end sm:self-center">
+                    <GraduationCap size={32} className="md:w-10 md:h-10" />
                   </div>
                 </div>
 

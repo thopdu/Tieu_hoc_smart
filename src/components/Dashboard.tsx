@@ -28,8 +28,8 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
       grade,
       subject,
       mode: "semester_review",
-      count: 25,
-      difficulty: "30% dễ, 40% trung bình, 30% khó"
+      count: 10,
+      difficulty: "30% nhận biết, 40% thông hiểu, 30% vận dụng"
     });
   };
 
@@ -183,8 +183,8 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                 >
                   <div>
                     <div className="bg-white/20 w-fit px-4 py-1 rounded-full text-xs font-bold mb-3 uppercase tracking-widest">Đặc biệt</div>
-                    <h4 className="text-3xl font-black font-display mb-2">Ôn Tập Học Kỳ (25 câu)</h4>
-                    <p className="text-emerald-50 opacity-90">Cấu trúc: 30% dễ, 40% trung bình, 30% khó. Đầy đủ kiến thức trọng tâm.</p>
+                    <h4 className="text-3xl font-black font-display mb-2">Ôn Tập Học Kỳ (Đề 10 Câu)</h4>
+                    <p className="text-emerald-50 opacity-90">Cấu trúc: Trắc nghiệm & Tự luận. Điểm số tối đa là 10.0</p>
                   </div>
                   <div className="bg-white/20 p-5 rounded-3xl group-hover:bg-white group-hover:text-emerald-600 transition-all">
                     <GraduationCap size={40} />

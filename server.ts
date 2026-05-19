@@ -26,17 +26,27 @@ app.post("/api/generate-questions", async (req, res) => {
   const { grade, subject, topic, difficulty, count = 5 } = req.body;
 
   try {
+    const isSemesterReview = req.body.mode === "semester_review";
+
     const prompt = `Bạn là một chuyên gia giáo dục tiểu học tại Việt Nam. 
     Hãy tạo ra ${count} câu hỏi ôn tập cho học sinh Lớp ${grade}, môn ${subject}${topic ? `, chủ đề: "${topic}"` : ''}.
     Mô tả yêu cầu về độ khó: ${difficulty}.
     Chương trình: Kết nối tri thức và cuộc sống.
     
+    ${isSemesterReview ? `YÊU CẦU ĐẶC BIỆT CHO ÔN TẬP HỌC KỲ:
+    1. Chia đề làm 2 phần: "I. PHẦN TRẮC NGHIỆM" và "II. PHẦN TỰ LUẬN".
+    2. Các câu hỏi Trắc nghiệm chiếm khoảng 60-70% số câu, Tự luận chiếm 30-40%.
+    3. Mỗi câu hỏi cần có điểm số (field: points), tổng điểm là 10.
+    4. Các chủ đề bao gồm: Số học (liền trước/số thành phần), Làm tròn số, Số La Mã, Xem đồng hồ, Đơn vị đo, Hình học (Diện tích/Chu vi), Toán đố có lời văn.` : ''}
+
     Yêu cầu định dạng JSON:
     {
       "questions": [
         {
           "id": "string",
-          "type": "multiple_choice | fill_in_blank | drag_drop",
+          "type": "multiple_choice | fill_in_blank",
+          "section": "string" (Ví dụ: "I. PHẦN TRẮC NGHIỆM" hoặc "II. PHẦN TỰ LUẬN"),
+          "points": number (số điểm cho câu này),
           "questionText": "string",
           "options": ["string"] (nếu là trắc nghiệm, cung cấp 4 phương án),
           "correctAnswer": "string",
@@ -60,6 +70,8 @@ app.post("/api/generate-questions", async (req, res) => {
                 properties: {
                   id: { type: Type.STRING },
                   type: { type: Type.STRING },
+                  section: { type: Type.STRING },
+                  points: { type: Type.NUMBER },
                   questionText: { type: Type.STRING },
                   options: { type: Type.ARRAY, items: { type: Type.STRING } },
                   correctAnswer: { type: Type.STRING },

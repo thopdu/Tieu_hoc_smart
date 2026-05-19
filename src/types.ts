@@ -23,6 +23,8 @@ export interface Question {
   correctAnswer: string;
   explanation: string;
   image?: string;
+  section?: string;
+  points?: number;
 }
 
 export interface UserProfile {

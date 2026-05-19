@@ -67,8 +67,12 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
     setFeedback(isCorrect ? "correct" : "wrong");
     
     if (isCorrect) {
-      const pointsPerQuestion = 100 / count;
-      setScore(s => Math.round(s + pointsPerQuestion));
+      if (currentQuestion.points) {
+        setScore(s => Number((s + currentQuestion.points!).toFixed(1)));
+      } else {
+        const pointsPerQuestion = 100 / count;
+        setScore(s => Math.round(s + pointsPerQuestion));
+      }
     }
   };
 
@@ -124,6 +128,13 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tighter">
+          {config.mode === 'semester_review' ? `Đề Ôn Tập Học Kỳ ${config.subject} - Đề Số 1` : `Luyện tập: ${config.subject}`}
+        </h1>
+        {config.mode === 'topic_focus' && <p className="text-blue-600 font-bold">Chuyên đề: {config.topic}</p>}
+      </div>
+
       <div className="flex items-center justify-between mb-10">
         <div className="flex items-center gap-4">
           <div className="bg-white rounded-2xl px-6 py-3 border border-blue-100 shadow-sm">
@@ -146,11 +157,22 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
         key={currentIndex}
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="bg-white rounded-[3rem] p-8 md:p-12 shadow-sm border border-blue-50 min-h-[450px] flex flex-col justify-between"
+        className="bg-white rounded-[3rem] p-8 md:p-12 shadow-sm border border-blue-50 min-h-[450px] flex flex-col justify-between relative overflow-hidden"
       >
+        {currentQuestion.section && (
+          <div className="absolute top-0 right-0 bg-blue-50 px-6 py-2 rounded-bl-3xl font-bold text-blue-600 text-sm uppercase">
+            {currentQuestion.section}
+          </div>
+        )}
+
         <div>
           <h2 className="text-3xl md:text-4xl font-bold text-slate-800 mb-10 leading-tight font-display">
             {currentQuestion.questionText}
+            {currentQuestion.points && (
+              <span className="ml-3 text-lg font-bold text-blue-500 bg-blue-50 px-3 py-1 rounded-xl">
+                ({currentQuestion.points} điểm)
+              </span>
+            )}
           </h2>
 
           <div className="grid gap-4">

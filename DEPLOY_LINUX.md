@@ -31,7 +31,13 @@ Cài đặt PM2 nếu chưa có:
 ```bash
 sudo npm install -g pm2
 ```
-Chạy ứng dụng:
+
+Mở file `ecosystem.config.cjs` và điền `GEMINI_API_KEY` của bạn vào. Sau đó chạy:
+```bash
+pm2 start ecosystem.config.cjs
+```
+
+Bạn cũng có thể chạy trực tiếp nếu không muốn dùng file config:
 ```bash
 NODE_ENV=production GEMINI_API_KEY=your_key_here pm2 start dist/server.cjs --name "hanh-trang-hoc-tap"
 ```
@@ -71,6 +77,31 @@ sudo systemctl restart nginx
 ```bash
 sudo ufw allow 'Nginx Full'
 ```
+
+## Bước 7: Kiểm tra ứng dụng đã chạy chưa
+
+### 1. Kiểm tra tiến trình Node.js (PM2)
+```bash
+pm2 status
+```
+- Nếu cột `status` báo **online** (màu xanh): Ứng dụng đang chạy tốt.
+- Nếu báo **errored** hoặc **stopped**: Hãy xem lỗi bằng lệnh `pm2 logs hanh-trang-hoc-tap`.
+
+### 2. Kiểm tra Port nội bộ
+```bash
+curl -I http://localhost:3000
+```
+Nếu kết quả hiện `HTTP/1.1 200 OK`, nghĩa là mã nguồn đã chạy thành công trên server.
+
+### 3. Kiểm tra Nginx
+```bash
+sudo systemctl status nginx
+```
+Đảm bảo Nginx đang ở trạng thái `active (running)`.
+
+### 4. Kiểm tra Nhật ký (Logs) khi có lỗi
+- Lọc lỗi từ PM2: `pm2 logs`
+- Lọc lỗi từ Nginx: `sudo tail -f /var/log/nginx/error.log`
 
 ---
 **Chúc mừng!** Ứng dụng của bạn hiện đã chạy tại địa chỉ IP hoặc tên miền của máy chủ.

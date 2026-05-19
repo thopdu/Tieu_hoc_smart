@@ -87,20 +87,20 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[2.5rem] p-8 md:p-12 text-white mb-12 relative overflow-hidden shadow-lg min-h-[300px] flex items-center"
+        className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-[2.5rem] p-6 sm:p-8 md:p-12 text-white mb-8 md:mb-12 relative overflow-hidden shadow-lg min-h-[auto] md:min-h-[300px] flex items-center"
       >
         <div className="relative z-10 max-w-2xl">
-          <h2 className="text-4xl md:text-5xl font-black mb-4 font-display leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 font-display leading-tight">
             Chào bạn nhỏ, hôm nay học gì nhỉ? 👋
           </h2>
-          <p className="text-blue-100 text-lg mb-8 leading-relaxed opacity-90">
+          <p className="text-blue-100 text-base md:text-lg mb-6 md:mb-8 leading-relaxed opacity-90">
             Bạn đã sẵn sàng để chinh phục những kiến thức mới và nhận huy hiệu "Chiến binh hiếu học" chưa?
           </p>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-4">
             <button 
               onClick={() => profile?.lastSession && onStart(profile.lastSession)}
               disabled={!profile?.lastSession}
-              className={`px-8 py-4 rounded-full font-bold text-lg transition-all shadow-md flex items-center gap-2 ${
+              className={`w-full sm:w-auto px-8 py-4 rounded-full font-bold text-lg transition-all shadow-md flex items-center justify-center gap-2 ${
                 profile?.lastSession 
                 ? 'bg-yellow-400 hover:bg-yellow-300 text-indigo-900 border-b-4 border-yellow-600 active:border-b-0' 
                 : 'bg-white/20 text-white/50 cursor-not-allowed'
@@ -108,7 +108,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
             >
               Học tiếp bài cũ <ChevronRight />
             </button>
-            <div className="flex -space-x-4 items-center">
+            <div className="flex -space-x-4 items-center justify-center sm:justify-start">
               {[1, 2, 3].map(i => (
                 <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-blue-400 overflow-hidden shadow-sm">
                   <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${i * 777}`} alt="avatar" />
@@ -228,12 +228,12 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                         <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
                       </h3>
                     </div>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2 md:gap-3">
                       {mathTopics.map((topic, i) => (
                         <button 
                           key={i}
                           onClick={() => startTopic(selectedGrade, "Toán", topic)}
-                          className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
+                          className="bg-white border border-slate-100 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm text-sm md:text-base"
                         >
                           {topic}
                         </button>
@@ -248,12 +248,12 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                         <BookText size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
                       </h3>
                     </div>
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2 md:gap-3">
                       {englishTopics.map((topic, i) => (
                         <button 
                           key={i}
                           onClick={() => startTopic(selectedGrade, "Tiếng Anh", topic)}
-                          className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-pink-500 hover:text-pink-600 transition-all shadow-sm"
+                          className="bg-white border border-slate-100 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-slate-600 hover:border-pink-500 hover:text-pink-600 transition-all shadow-sm text-sm md:text-base"
                         >
                           {topic}
                         </button>

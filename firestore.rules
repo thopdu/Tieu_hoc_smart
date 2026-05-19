@@ -24,7 +24,7 @@ service cloud.firestore {
              data.displayName.size() <= 100 &&
              data.email is string &&
              data.grade >= 1 && data.grade <= 5 &&
-             data.totalPoints is int &&
+             data.totalPoints is number &&
              data.badges is list &&
              data.createdAt is int;
     }
@@ -39,8 +39,7 @@ service cloud.firestore {
     }
 
     match /users/{userId} {
-      allow get: if isSignedIn();
-      allow list: if isSignedIn();
+      allow read: if true; 
       allow create: if isOwner(userId) && isValidUserProfile(request.resource.data);
       allow update: if isOwner(userId) && 
                       (
@@ -49,10 +48,9 @@ service cloud.firestore {
     }
 
     match /results/{resultId} {
-      allow get: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && isValidExamResult(request.resource.data);
-      allow update, delete: if false; // Results are immutable
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if false; 
     }
   }
 }

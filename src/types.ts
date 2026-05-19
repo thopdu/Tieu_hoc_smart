@@ -36,6 +36,7 @@ export interface UserProfile {
   totalPoints: number;
   badges: string[];
   createdAt: number;
+  lastSession?: PracticeConfig;
 }
 
 export interface ExamResult {

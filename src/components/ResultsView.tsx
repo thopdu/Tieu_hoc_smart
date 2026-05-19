@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Trophy, Star, ArrowLeft, RotateCcw, Share2, Award } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
+import { Trophy, ArrowLeft, RotateCcw, Share2, Award } from 'lucide-react';
 import { Grade, Subject, PracticeConfig } from '../types';
+import { useAuth } from '../lib/AuthContext';
+import { addDoc, collection, doc, increment, updateDoc } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface ResultsViewProps {
   score: number;
@@ -11,9 +14,45 @@ interface ResultsViewProps {
 }
 
 export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onRestart, onGoHome }) => {
-  const { grade, subject, mode } = config;
+  const { user, refreshProfile } = useAuth();
+  const [saving, setSaving] = useState(false);
+  const { grade, subject } = config;
+
+  const xpEarned = score * 10;
+
+  useEffect(() => {
+    const saveResult = async () => {
+      if (!user) return;
+      setSaving(true);
+      try {
+        // Save to results collection
+        await addDoc(collection(db, 'results'), {
+          userId: user.uid,
+          subject,
+          grade,
+          score,
+          xpEarned,
+          completedAt: Date.now()
+        });
+
+        // Update user's total points
+        const userRef = doc(db, 'users', user.uid);
+        await updateDoc(userRef, {
+          totalPoints: increment(xpEarned)
+        });
+
+        await refreshProfile();
+      } catch (error) {
+        console.error("Error saving results:", error);
+      } finally {
+        setSaving(false);
+      }
+    };
+
+    saveResult();
+  }, [user, score, subject, grade, xpEarned, refreshProfile]);
+
   const getFeedback = () => {
-    const totalPotential = 100; // Normalized score percent
     if (score === 100) return { title: "Tuyệt đỉnh!", msg: "Em đã đạt điểm tuyệt đối. Thật đáng tự hào!", icon: "🏆" };
     if (score >= 80) return { title: "Xuất sắc!", msg: "Em làm rất tốt, hãy phát huy nhé!", icon: "🌟" };
     if (score >= 50) return { title: "Khá lắm!", msg: "Em đã nắm được bài, cố gắng thêm một chút nữa nhé!", icon: "👍" };
@@ -65,9 +104,13 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
           <button className="p-5 rounded-2xl bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-blue-500 transition-all border border-slate-100">
             <Share2 size={24} />
           </button>
-          <div className="flex items-center gap-3 px-8 py-4 bg-emerald-50 text-emerald-700 rounded-2xl font-bold border border-emerald-100">
-            <Award size={24} className="animate-bounce" />
-            Đã lưu vào thành tích
+          <div className={`flex items-center gap-3 px-8 py-4 rounded-2xl font-bold border transition-all ${saving ? 'bg-slate-50 text-slate-400 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>
+            {saving ? (
+              <div className="w-5 h-5 border-2 border-slate-300 border-t-slate-500 rounded-full animate-spin" />
+            ) : (
+              <Award size={24} className="animate-bounce" />
+            )}
+            {saving ? 'Đang lưu kết quả...' : 'Đã lưu vào thành tích'}
           </div>
         </div>
       </motion.div>

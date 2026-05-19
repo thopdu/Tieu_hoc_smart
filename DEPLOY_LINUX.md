@@ -104,4 +104,18 @@ sudo systemctl status nginx
 - Lọc lỗi từ Nginx: `sudo tail -f /var/log/nginx/error.log`
 
 ---
+## Bước 8: Cập nhật mã nguồn mới (Update & Reload)
+
+Khi bạn có thay đổi về code và muốn đưa lên server, hãy chạy chuỗi lệnh sau:
+
+1. **Kéo code mới về**: `git pull`
+2. **Cài đặt thư viện (nếu có thêm mới)**: `npm install`
+3. **Xây dựng lại ứng dụng**: `npm run build`
+4. **Làm mới quy trình PM2**: 
+   ```bash
+   pm2 reload hanh-trang-hoc-tap
+   ```
+   *(Dùng `reload` sẽ tốt hơn `restart` vì nó không làm mất kết nối của người dùng đang truy cập).*
+
+---
 **Chúc mừng!** Ứng dụng của bạn hiện đã chạy tại địa chỉ IP hoặc tên miền của máy chủ.

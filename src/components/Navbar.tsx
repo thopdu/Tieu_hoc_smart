@@ -3,12 +3,17 @@ import { BookOpen, Trophy, User, Home, Star } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { signInWithGoogle, logout } from '../lib/firebase';
 
-export const Navbar: React.FC = () => {
+interface NavbarProps {
+  onLeaderboardClick: () => void;
+  onHomeClick: () => void;
+}
+
+export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick }) => {
   const { user, profile, loading } = useAuth();
 
   return (
     <nav className="h-20 bg-white border-b border-blue-100 flex items-center justify-between px-8 shadow-sm shrink-0 sticky top-0 z-50">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 cursor-pointer" onClick={onHomeClick}>
         <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-2xl shadow-inner">🎓</div>
         <div className="leading-tight">
           <h1 className="font-bold text-xl text-blue-600 font-display">TIỂU HỌC SMART</h1>
@@ -18,13 +23,16 @@ export const Navbar: React.FC = () => {
 
       <div className="flex items-center gap-8">
         <div className="hidden lg:flex items-center gap-6 font-bold text-sm text-slate-500">
-          <button className="text-blue-600 border-b-2 border-blue-600 pb-1 flex items-center gap-1.5">
+          <button 
+            onClick={onHomeClick}
+            className="hover:text-blue-600 flex items-center gap-1.5 transition-colors"
+          >
             <Home size={16} /> Trang chủ
           </button>
-          <button className="hover:text-blue-500 flex items-center gap-1.5 transition-colors">
-            <Star size={16} /> Chuyên đề
-          </button>
-          <button className="hover:text-blue-500 flex items-center gap-1.5 transition-colors">
+          <button 
+            onClick={onLeaderboardClick}
+            className="hover:text-blue-500 flex items-center gap-1.5 transition-colors"
+          >
             <Trophy size={16} /> Xếp hạng
           </button>
         </div>

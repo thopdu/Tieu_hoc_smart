@@ -1,14 +1,34 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookText, Calculator, ChevronRight, GraduationCap, Trophy, Sparkles, Map } from 'lucide-react';
-import { Grade, Subject, PracticeConfig } from '../types';
+import { Grade, Subject, PracticeConfig, UserProfile } from '../types';
+import { useAuth } from '../lib/AuthContext';
+import { collection, limit, orderBy, query, getDocs } from 'firebase/firestore';
+import { db } from '../lib/firebase';
 
 interface PracticeInterfaceProps {
   onStart: (config: PracticeConfig) => void;
 }
 
 export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
-  const [selectedGrade, setSelectedGrade] = useState<Grade | null>(null);
+  const { profile } = useAuth();
+  const [selectedGrade, setSelectedGrade] = useState<Grade | null>(profile?.grade || null);
+  const [topUsers, setTopUsers] = useState<UserProfile[]>([]);
+
+  useEffect(() => {
+    const fetchMiniLeaderboard = async () => {
+      const q = query(collection(db, 'users'), orderBy('totalPoints', 'desc'), limit(3));
+      const snap = await getDocs(q);
+      setTopUsers(snap.docs.map(doc => doc.data() as UserProfile));
+    };
+    fetchMiniLeaderboard();
+  }, []);
+
+  useEffect(() => {
+    if (profile?.grade && !selectedGrade) {
+      setSelectedGrade(profile.grade);
+    }
+  }, [profile, selectedGrade]);
 
   const mathTopics = ["Phép cộng, phép trừ", "Phép nhân, phép chia", "Hình học & Đo lường", "Bài toán có lời văn", "Số học & So sánh"];
   const englishTopics = ["Vocabulary (Từ vựng)", "Grammar (Ngữ pháp)", "Reading (Đọc hiểu)", "Listening (Nghe hiểu)", "Phonics (Phát âm)"];
@@ -77,7 +97,15 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
             Bạn đã sẵn sàng để chinh phục những kiến thức mới và nhận huy hiệu "Chiến binh hiếu học" chưa?
           </p>
           <div className="flex flex-wrap gap-4">
-            <button className="bg-yellow-400 hover:bg-yellow-300 text-indigo-900 px-8 py-4 rounded-full font-bold text-lg transition-all shadow-md flex items-center gap-2">
+            <button 
+              onClick={() => profile?.lastSession && onStart(profile.lastSession)}
+              disabled={!profile?.lastSession}
+              className={`px-8 py-4 rounded-full font-bold text-lg transition-all shadow-md flex items-center gap-2 ${
+                profile?.lastSession 
+                ? 'bg-yellow-400 hover:bg-yellow-300 text-indigo-900 border-b-4 border-yellow-600 active:border-b-0' 
+                : 'bg-white/20 text-white/50 cursor-not-allowed'
+              }`}
+            >
               Học tiếp bài cũ <ChevronRight />
             </button>
             <div className="flex -space-x-4 items-center">
@@ -242,23 +270,20 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
               Bảng Vàng Tuần <Trophy size={18} className="text-yellow-500" />
             </h3>
             <div className="space-y-4">
-              {[
-                { name: "Minh Tuấn", xp: "3,420", color: "bg-yellow-400", rank: 1, symbol: "👑" },
-                { name: "Hoàng Anh", xp: "2,890", color: "bg-indigo-400", rank: 2 },
-                { name: "Bạn", xp: "1,250", color: "bg-blue-500", rank: 7, me: true },
-              ].map((item, i) => (
-                <div key={i} className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${item.me ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100'}`}>
-                  <span className={`font-black text-xs w-6 text-center ${item.rank === 1 ? 'text-yellow-600' : 'text-slate-400'}`}>{item.rank}</span>
-                  <div className={`w-10 h-10 rounded-full ${item.color} flex items-center justify-center text-white text-xs font-bold`}>
-                    {item.name.substring(0, 2).toUpperCase()}
+              {topUsers.map((user, i) => (
+                <div key={user.uid} className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${user.uid === profile?.uid ? 'bg-blue-50 border-blue-200' : 'bg-slate-50 border-slate-100'}`}>
+                  <span className={`font-black text-xs w-6 text-center ${i === 0 ? 'text-yellow-600' : 'text-slate-400'}`}>{i + 1}</span>
+                  <div className={`w-10 h-10 rounded-full bg-blue-100 border-2 border-white overflow-hidden flex items-center justify-center`}>
+                    <img src={`https://api.dicebear.com/7.x/adventurer/svg?seed=${user.uid}`} alt="avatar" />
                   </div>
                   <div className="flex-1">
-                    <p className={`text-sm font-bold ${item.me ? 'text-blue-800' : 'text-slate-700'}`}>{item.name}</p>
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{item.xp} XP</p>
+                    <p className={`text-sm font-bold ${user.uid === profile?.uid ? 'text-blue-800' : 'text-slate-700'}`}>{user.displayName}</p>
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">{user.totalPoints.toLocaleString()} XP</p>
                   </div>
-                  {item.symbol && <span className="text-lg">{item.symbol}</span>}
+                  {i === 0 && <span className="text-lg">👑</span>}
                 </div>
               ))}
+              {topUsers.length === 0 && <p className="text-center text-xs text-slate-400 py-4 italic">Đang tải bảng xếp hạng...</p>}
             </div>
           </div>
 

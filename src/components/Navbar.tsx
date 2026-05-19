@@ -35,6 +35,18 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
           >
             <Trophy size={16} /> Xếp hạng
           </button>
+          <button 
+            onClick={() => {
+              onHomeClick();
+              setTimeout(() => {
+                const element = document.getElementById('topics-section');
+                element?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            className="hover:text-blue-500 flex items-center gap-1.5 transition-colors"
+          >
+            <Star size={16} /> Chuyên đề
+          </button>
         </div>
 
         {loading ? (

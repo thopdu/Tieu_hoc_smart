@@ -219,45 +219,48 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                   </div>
                 </div>
 
-                {/* Math Topics Section */}
-                <section>
-                  <div className="flex items-center justify-between mb-6 px-1">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                       <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {mathTopics.map((topic, i) => (
-                      <button 
-                        key={i}
-                        onClick={() => startTopic(selectedGrade, "Toán", topic)}
-                        className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
-                      >
-                        {topic}
-                      </button>
-                    ))}
-                  </div>
-                </section>
+                {/* Topics Container */}
+                <div id="topics-section" className="space-y-12 pt-8">
+                  {/* Math Topics Section */}
+                  <section>
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
+                      </h3>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      {mathTopics.map((topic, i) => (
+                        <button 
+                          key={i}
+                          onClick={() => startTopic(selectedGrade, "Toán", topic)}
+                          className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm"
+                        >
+                          {topic}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
 
-                {/* English Topics Section */}
-                <section>
-                  <div className="flex items-center justify-between mb-6 px-1">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                       <BookText size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {englishTopics.map((topic, i) => (
-                      <button 
-                        key={i}
-                        onClick={() => startTopic(selectedGrade, "Tiếng Anh", topic)}
-                        className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-pink-500 hover:text-pink-600 transition-all shadow-sm"
-                      >
-                        {topic}
-                      </button>
-                    ))}
-                  </div>
-                </section>
+                  {/* English Topics Section */}
+                  <section>
+                    <div className="flex items-center justify-between mb-6 px-1">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                        <BookText size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
+                      </h3>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      {englishTopics.map((topic, i) => (
+                        <button 
+                          key={i}
+                          onClick={() => startTopic(selectedGrade, "Tiếng Anh", topic)}
+                          className="bg-white border border-slate-100 px-6 py-3 rounded-2xl font-bold text-slate-600 hover:border-pink-500 hover:text-pink-600 transition-all shadow-sm"
+                        >
+                          {topic}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                </div>
               </motion.section>
             )}
           </AnimatePresence>

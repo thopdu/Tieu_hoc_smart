@@ -104,7 +104,30 @@ sudo systemctl status nginx
 - Lọc lỗi từ Nginx: `sudo tail -f /var/log/nginx/error.log`
 
 ---
-## Bước 8: Cập nhật mã nguồn mới (Update & Reload)
+## Bước 8: Cấu hình Firebase để đăng nhập trên Tên miền riêng
+
+Nếu bạn sử dụng tên miền riêng (ví dụ: `giasuhongtrang.edu.vn`), bạn **bắt buộc** phải thực hiện các bước sau để chức năng Đăng nhập hoạt động:
+
+### 1. Thêm tên miền vào Firebase Console
+1. Truy cập [Firebase Console](https://console.firebase.google.com/).
+2. Chọn dự án của bạn -> **Authentication** -> Tab **Settings**.
+3. Tại phần **Authorized domains**, nhấn **Add domain** và nhập tên miền của bạn (ví dụ: `giasuhongtrang.edu.vn`).
+
+### 2. Sử dụng HTTPS (Bắt buộc cho Google Auth)
+Google Auth và các tính năng bảo mật của trình duyệt yêu cầu web phải chạy trên giao thức **HTTPS**.
+- Bạn nên cài đặt SSL miễn phí bằng **Certbot (Let's Encrypt)**:
+  ```bash
+  sudo apt install certbot python3-certbot-nginx
+  sudo certbot --nginx -d giasuhongtrang.edu.vn
+  ```
+
+### 3. Cấu hình Google Cloud Console
+1. Truy cập [Google Cloud Console Credentials](https://console.cloud.google.com/apis/credentials).
+2. Tìm OAuth 2.0 Client ID bạn đang dùng cho dự án.
+3. Thêm tên miền của bạn vào phần **Authorized JavaScript origins**.
+
+---
+## Bước 9: Cập nhật mã nguồn mới (Update & Reload)
 
 Khi bạn có thay đổi về code và muốn đưa lên server, hãy chạy chuỗi lệnh sau:
 

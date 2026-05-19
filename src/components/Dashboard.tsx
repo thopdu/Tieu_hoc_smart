@@ -17,9 +17,13 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
 
   useEffect(() => {
     const fetchMiniLeaderboard = async () => {
-      const q = query(collection(db, 'users'), orderBy('totalPoints', 'desc'), limit(3));
-      const snap = await getDocs(q);
-      setTopUsers(snap.docs.map(doc => doc.data() as UserProfile));
+      try {
+        const q = query(collection(db, 'users'), orderBy('totalPoints', 'desc'), limit(3));
+        const snap = await getDocs(q);
+        setTopUsers(snap.docs.map(doc => doc.data() as UserProfile));
+      } catch (error) {
+        console.error("Error fetching leaderboard:", error);
+      }
     };
     fetchMiniLeaderboard();
   }, []);

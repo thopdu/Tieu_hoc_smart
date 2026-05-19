@@ -124,7 +124,16 @@ Google Auth và các tính năng bảo mật của trình duyệt yêu cầu web
 ### 3. Cấu hình Google Cloud Console
 1. Truy cập [Google Cloud Console Credentials](https://console.cloud.google.com/apis/credentials).
 2. Tìm OAuth 2.0 Client ID bạn đang dùng cho dự án.
-3. Thêm tên miền của bạn vào phần **Authorized JavaScript origins**.
+3. Thêm tên miền của bạn vào phần **Authorized JavaScript origins** (ví dụ: `https://giasuhongtrang.edu.vn`).
+4. Thêm URL callback vào phần **Authorized redirect URIs** (ví dụ: `https://giasuhongtrang.edu.vn/__/auth/handler`).
+
+### 4. Sửa lỗi "Cross-Origin-Opener-Policy" (COOP)
+Nếu bạn nhận được lỗi COOP khi đăng nhập, hãy kiểm tra file cấu hình Nginx (`/etc/nginx/sites-available/...`).
+Đảm bảo bạn **không** đặt `same-origin`. Nếu có, hãy sửa thành:
+```nginx
+add_header Cross-Origin-Opener-Policy "same-origin-allow-popups";
+```
+Hoặc tạm thời xóa dòng đó nếu không cần thiết.
 
 ---
 ## Bước 9: Cập nhật mã nguồn mới (Update & Reload)

@@ -185,7 +185,7 @@ export const StudentProfile: React.FC = () => {
           
           <div className="text-center md:text-left flex-1">
             <div className="flex items-center justify-center md:justify-start gap-3 flex-wrap">
-              <h2 className="text-3xl font-black font-display">{profile?.displayName || "Học sinh Smart"}</h2>
+              <h2 className="text-3xl font-black font-display">{profile?.displayName || "Học sinh"}</h2>
               <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wider uppercase border border-white/10">Lớp {profile?.grade || 1}</span>
               {isDiamondUser ? (
                 <span className="bg-yellow-400 text-indigo-950 px-3 py-1 rounded-full text-xs font-black tracking-wider uppercase border border-yellow-200 flex items-center gap-1 shadow-sm">

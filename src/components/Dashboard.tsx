@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookText, Calculator, ChevronRight, GraduationCap, Trophy, Sparkles, Map } from 'lucide-react';
+import { BookText, Calculator, ChevronRight, GraduationCap, Trophy, Sparkles, Map, Search, X } from 'lucide-react';
 import { Grade, Subject, PracticeConfig, UserProfile, PracticeMode } from '../types';
 import { useAuth } from '../lib/AuthContext';
 import { collection, limit, orderBy, query, getDocs } from 'firebase/firestore';
@@ -15,6 +15,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(profile?.grade || null);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [topUsers, setTopUsers] = useState<UserProfile[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     // Reset subject when grade changes
@@ -202,6 +203,31 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
 
   const grades: Grade[] = [1, 2, 3, 4, 5];
 
+  // Dynamically build all searchable items for internal search optimization
+  const getAllSearchableTopics = () => {
+    const list: { grade: Grade; subject: Subject; topic: string }[] = [];
+    const subjectsList: Subject[] = ["Toán", "Tiếng Việt", "Tiếng Anh", "Tin học"];
+    grades.forEach(g => {
+      subjectsList.forEach(s => {
+        if (s === "Tin học" && g === 1) return; // Tin học is only for grades 2 to 5
+        const topics = getSubjectTopics(g, s);
+        topics.forEach(t => {
+          list.push({ grade: g, subject: s, topic: t });
+        });
+      });
+    });
+    return list;
+  };
+
+  const searchableTopics = getAllSearchableTopics();
+  const filteredSearchTopics = searchQuery.trim() !== ""
+    ? searchableTopics.filter(item => 
+        item.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        `lớp ${item.grade}`.includes(searchQuery.toLowerCase())
+      )
+    : [];
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Hero Section */}
@@ -245,6 +271,82 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
         <div className="absolute right-10 bottom-0 text-[180px] opacity-20 pointer-events-none grayscale brightness-200">🦊</div>
         <Sparkles className="absolute top-10 right-1/4 text-yellow-300 w-8 h-8 animate-pulse" />
       </motion.div>
+
+      {/* Search Bar section */}
+      <div className="mb-10 max-w-2xl mx-auto relative z-20">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <Search className="text-slate-400 w-5 h-5 focus-within:text-blue-500 transition-colors" />
+          </div>
+          <input
+            type="text"
+            placeholder="Tìm nhanh bài học, chủ đề... (Ví dụ: cộng trừ, Scratch, từ vựng, con vật...)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-10 py-4 bg-white border-2 border-slate-100 hover:border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 rounded-2xl font-bold text-slate-750 placeholder-slate-400 transition-all outline-none shadow-sm shadow-slate-100"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+          )}
+        </div>
+        
+        {/* Real-time Search Results Box */}
+        <AnimatePresence>
+          {searchQuery.trim() !== '' && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="absolute left-0 right-0 mt-3 bg-white rounded-2xl border border-slate-150 shadow-2xl overflow-hidden max-h-96 overflow-y-auto divide-y divide-slate-100 z-50 text-slate-700"
+            >
+              <div className="p-3 bg-slate-50 text-xs font-bold text-slate-400 uppercase tracking-widest flex justify-between items-center">
+                <span>Kết quả tìm kiếm ({filteredSearchTopics.length})</span>
+                {filteredSearchTopics.length > 0 && <span className="text-[10px] text-blue-500 lowercase font-bold">Bấm để luyện tập ngay</span>}
+              </div>
+              {filteredSearchTopics.length > 0 ? (
+                filteredSearchTopics.map((item, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      startTopic(item.grade, item.subject, item.topic);
+                      setSearchQuery('');
+                    }}
+                    className="w-full p-4 hover:bg-slate-50 text-left transition-colors flex items-center justify-between group cursor-pointer"
+                  >
+                    <div>
+                      <p className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">{item.topic}</p>
+                      <div className="flex gap-2 mt-1">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                          item.subject === 'Toán' ? 'bg-orange-50 text-orange-600 border border-orange-100' :
+                          item.subject === 'Tiếng Việt' ? 'bg-blue-50 text-blue-600 border border-blue-100' :
+                          item.subject === 'Tin học' ? 'bg-teal-50 text-teal-600 border border-teal-100' :
+                          'bg-pink-50 text-pink-600 border border-pink-100'
+                        }`}>
+                          {item.subject}
+                        </span>
+                        <span className="text-[10px] bg-slate-100 text-slate-500 font-bold px-2 py-0.5 rounded">
+                          Lớp {item.grade}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronRight size={18} className="text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                  </button>
+                ))
+              ) : (
+                <div className="p-8 text-center text-slate-400">
+                  <p className="font-bold">Không tìm thấy bài học phù hợp</p>
+                  <p className="text-xs text-slate-400 mt-1">Hãy thử tìm với các cụm từ ngắn hơn như: "cộng", "chia", "vẽ", "Scratch"...</p>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Side: Navigation & Subjects */}

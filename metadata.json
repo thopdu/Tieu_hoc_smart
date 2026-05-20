@@ -1,6 +1,6 @@
 {
-  "name": "Hành Trang Học Tập - Học Vui Mỗi Ngày",
-  "description": "Nền tảng ôn tập Toán và Tiếng Việt chuẩn chương trình 'Kết nối tri thức và cuộc sống' cho học sinh tiểu học (Lớp 1-5) tích hợp trí tuệ nhân tạo.",
+  "name": "Vui Học Tiểu Học",
+  "description": "Nền tảng ôn tập trực tuyến vui vẻ, bổ ích các môn Toán, Tiếng Việt, Tiếng Anh, Tin học chuẩn chương trình lớp 1 đến lớp 5 cho học sinh Tiểu học.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

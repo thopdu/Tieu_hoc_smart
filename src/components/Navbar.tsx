@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick,
         <div className="flex items-center gap-2 md:gap-3 cursor-pointer" onClick={onHomeClick}>
           <div className="w-10 h-10 md:w-12 md:h-12 bg-yellow-400 rounded-full flex items-center justify-center text-xl md:text-2xl shadow-inner">🎓</div>
           <div className="leading-tight">
-            <h1 className="font-bold text-lg md:text-xl text-blue-600 font-display uppercase tracking-tight">Tiểu học Smart</h1>
+            <h1 className="font-bold text-lg md:text-xl text-blue-600 font-display uppercase tracking-tight">Vui học Tiểu học</h1>
             <p className="hidden md:block text-[10px] uppercase tracking-widest text-blue-400 font-bold">Kết nối tri thức & Cuộc sống</p>
           </div>
         </div>
@@ -138,7 +138,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick,
               <div className="flex items-center justify-between mb-12">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-xl">🎓</div>
-                  <span className="font-bold text-blue-600">TIỂU HỌC SMART</span>
+                  <span className="font-bold text-blue-600">VUI HỌC TIỂU HỌC</span>
                 </div>
                 <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-slate-100 rounded-full cursor-pointer">
                   <X size={24} className="text-slate-400" />

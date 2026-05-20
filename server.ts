@@ -41,6 +41,12 @@ app.post("/api/generate-questions", async (req, res) => {
     Mô tả yêu cầu về độ khó: ${difficulty}.
     Chương trình: Kết nối tri thức và cuộc sống mới nhất.`;
 
+    if (subject === "Toán") {
+      prompt += `\n\nYÊU CẦU ĐẶC BIỆT CHO MÔN TOÁN:
+      - KHÔNG ĐƯỢC phép thêm khoảng trắng (khoảng cách) để phân tách hàng nghìn trong bất kỳ số nào (Ví dụ: viết "1000", "25000" thay vì "1 000", "25 000").
+      - Tất cả các con số trong đề bài, đáp án lựa chọn, đáp án đúng và phần lời giải thích đều phải viết liền và không có khoảng trắng xen giữa các chữ số hàng nghìn.`;
+    }
+
     if (isVietnamese && isSemesterReview) {
       prompt += `\n\nYÊU CẦU ĐẶC BIỆT CHO ĐỀ THI / ÔN TẬP TIẾNG VIỆT GIỮA KỲ VÀ CUỐI KỲ:
       1. Đề thi phải mô phỏng cấu trúc chuẩn: "II. KIỂM TRA ĐỌC HIỂU (6,0 điểm) - Thời gian 30 phút".
@@ -127,6 +133,27 @@ app.post("/api/generate-questions", async (req, res) => {
     }
 
     const data = JSON.parse(response.text);
+
+    // Clean any thousands spaces between digits for Mathematics
+    if (subject === "Toán" && data.questions && Array.isArray(data.questions)) {
+      const cleanMathNumbers = (str: any): any => {
+        if (typeof str !== "string") return str;
+        // Strip out spaces specifically when placed between two digits (e.g., "1 000" -> "1000")
+        return str.replace(/(\d)\s+(\d)/g, "$1$2");
+      };
+
+      data.questions = data.questions.map((q: any) => {
+        const cleaned: any = { ...q };
+        if (cleaned.questionText) cleaned.questionText = cleanMathNumbers(cleaned.questionText);
+        if (Array.isArray(cleaned.options)) {
+          cleaned.options = cleaned.options.map((opt: any) => cleanMathNumbers(opt));
+        }
+        if (cleaned.correctAnswer) cleaned.correctAnswer = cleanMathNumbers(cleaned.correctAnswer);
+        if (cleaned.explanation) cleaned.explanation = cleanMathNumbers(cleaned.explanation);
+        return cleaned;
+      });
+    }
+
     console.log("Generated questions successfully");
     res.json(data);
   } catch (error: any) {

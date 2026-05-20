@@ -17,12 +17,15 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
   const { user, refreshProfile } = useAuth();
   const [saving, setSaving] = useState(false);
   const { grade, subject } = config;
+  const hasSaved = React.useRef(false);
 
   const xpEarned = score * 10;
 
   useEffect(() => {
+    if (hasSaved.current || !user) return;
+
     const saveResult = async () => {
-      if (!user) return;
+      hasSaved.current = true;
       setSaving(true);
       try {
         // Save to results collection

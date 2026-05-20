@@ -491,11 +491,11 @@ export const StudentProfile: React.FC = () => {
                   </div>
                   
                   <h3 className="text-2xl sm:text-3xl font-black font-display tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-200 to-indigo-200">
-                    Báo Cáo Học Tập Kim Cương AI
+                    Báo Cáo Học Tập - {profile?.displayName || "Học Viên"}
                   </h3>
                   
                   <p className="text-slate-300 font-medium text-sm mt-3 leading-relaxed">
-                    Ba mẹ hoặc Thầy cô ơi! Hãy kích hoạt trạng thái <span className="text-cyan-400 font-bold">"Học viên Kim Cương"</span> tại trang quản trị hệ thống để mở khóa toàn bộ các siêu năng lực phân tích học tập thông minh bằng trí tuệ nhân tạo (AI):
+                    Ba mẹ ơi! Hãy kích hoạt <span className="text-cyan-400 font-bold">"Học viên Kim Cương"</span> để mở khóa toàn bộ các tính năng phân tích và đánh giá quá trình học tập con. Vui lòng liên hệ: 0941.38.28.35, Email: giasuhongtrang@gmail.com
                   </p>
 
                   <div className="mt-8 space-y-3.5 text-left max-w-md mx-auto">
@@ -522,13 +522,6 @@ export const StudentProfile: React.FC = () => {
                         <p className="text-[11px] text-slate-400 font-medium">Bộ đề xuất khắc phục chi tiết chuẩn sách Kết nối tri thức.</p>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="mt-8 pt-5 border-t border-white/10">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Lập quyền truy cập</p>
-                    <p className="text-xs text-orange-200 mt-1 leading-normal px-2">
-                       Sử dụng tài khoản có quyền Quản trị (hoặc tài khoản demo chứa chữ 'admin' trong mail) để ấn nút <span className="font-black bg-slate-800 text-amber-400 px-1.5 rounded-md">Quản trị</span> và nâng cấp cho học viên này nhé!
-                    </p>
                   </div>
                 </div>
               </div>

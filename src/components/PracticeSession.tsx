@@ -242,29 +242,29 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
   if (!currentQuestion) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 md:py-10">
-      <div className="text-center mb-6 md:mb-8">
-        <h1 className="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tighter">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 py-2 md:py-4">
+      <div className="text-center mb-3 md:mb-4">
+        <h1 className="text-lg md:text-xl font-extrabold text-slate-800 uppercase tracking-tight">
           {config.topic || (config.mode === 'semester_review' ? `Ôn Tập Học Kỳ ${config.subject}` : `Luyện tập: ${config.subject}`)}
         </h1>
-        {config.mode === 'topic_focus' && <p className="text-blue-600 font-bold text-sm md:text-base">Chuyên đề: {config.topic}</p>}
+        {config.mode === 'topic_focus' && <p className="text-blue-600 font-bold text-xs md:text-sm">Chuyên đề: {config.topic}</p>}
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
-        <div className="flex items-center gap-3 md:gap-4 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          <div className="bg-white rounded-2xl px-4 md:px-6 py-2 md:py-3 border border-blue-100 shadow-sm shrink-0">
-            <span className="text-blue-600 font-bold font-display text-lg md:text-xl">Câu {currentIndex + 1}/{questions.length}</span>
+      <div className="flex flex-col sm:flex-row items-center justify-between mb-4 md:mb-5 gap-3">
+        <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 justify-center">
+          <div className="bg-white rounded-xl px-3 py-1.5 md:py-2 border border-blue-100 shadow-sm shrink-0">
+            <span className="text-blue-600 font-bold font-display text-sm md:text-base">Câu {currentIndex + 1}/{questions.length}</span>
           </div>
-          <div className="bg-blue-600 rounded-2xl px-4 md:px-6 py-2 md:py-3 shadow-md shadow-blue-100 shrink-0">
-            <span className="text-white font-bold font-display text-lg md:text-xl">Điểm: {score}</span>
+          <div className="bg-blue-600 rounded-xl px-3 py-1.5 md:py-2 shadow-md shadow-blue-100 shrink-0">
+            <span className="text-white font-bold font-display text-sm md:text-base">Điểm: {score}</span>
           </div>
           {timeLeft !== null && (
-            <div className={`rounded-2xl px-4 md:px-6 py-2 md:py-3 shadow-sm border shrink-0 flex items-center gap-2 ${timeLeft < 300 ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
-              <span className="font-bold font-display text-lg md:text-xl">{formatTime(timeLeft)}</span>
+            <div className={`rounded-xl px-3 py-1.5 md:py-2 shadow-sm border shrink-0 flex items-center gap-1.5 ${timeLeft < 300 ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+              <span className="font-bold font-display text-sm md:text-base">{formatTime(timeLeft)}</span>
             </div>
           )}
         </div>
-        <div className="w-full sm:flex-1 sm:max-w-xs h-3 bg-slate-100 rounded-full overflow-hidden">
+        <div className="w-full sm:flex-1 sm:max-w-xs h-2 bg-slate-100 rounded-full overflow-hidden">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
@@ -392,12 +392,12 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
             }
 
             return (
-              <div className="lg:col-span-5 bg-gradient-to-br from-blue-50/30 to-slate-50 border border-blue-100/50 p-6 sm:p-8 rounded-[2rem] flex flex-col overflow-y-auto max-h-[400px] lg:max-h-[580px] shadow-sm select-text">
-                <span className="text-[10px] md:text-xs font-bold text-blue-500 uppercase tracking-widest mb-2 shrink-0">BÀI ĐỌC THẦM:</span>
-                <h3 className="text-xl font-extrabold text-slate-800 leading-tight mb-4 font-display text-center uppercase tracking-tight shrink-0">
+              <div className="lg:col-span-5 bg-gradient-to-br from-blue-50/30 to-slate-50 border border-blue-100/50 p-4 sm:p-5 rounded-2xl flex flex-col overflow-y-auto max-h-[300px] lg:max-h-[450px] shadow-sm select-text">
+                <span className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-1 shrink-0">BÀI ĐỌC THẦM:</span>
+                <h3 className="text-base font-extrabold text-slate-800 leading-tight mb-2 font-display text-center uppercase tracking-tight shrink-0">
                   {currentQuestion.readingPassage.title}
                 </h3>
-                <div className="text-slate-600 text-sm md:text-base leading-relaxed whitespace-pre-line font-medium">
+                <div className="text-slate-600 text-xs md:text-sm leading-relaxed whitespace-pre-line font-medium">
                   {currentQuestion.readingPassage.content}
                 </div>
               </div>
@@ -409,36 +409,36 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
           key={currentIndex}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
-          className={`bg-white rounded-[2rem] md:rounded-[3rem] p-6 sm:p-8 md:p-12 shadow-sm border border-blue-50 min-h-[400px] md:min-h-[450px] flex flex-col justify-between relative overflow-hidden ${
+          className={`bg-white rounded-2xl p-4 sm:p-5 md:p-6 lg:p-8 shadow-sm border border-blue-50 min-h-[300px] md:min-h-[350px] flex flex-col justify-between relative overflow-hidden ${
             currentQuestion.readingPassage ? 'lg:col-span-7' : 'w-full'
           }`}
         >
           {currentQuestion.section && (
-            <div className="absolute top-0 right-0 bg-blue-50 px-4 md:px-6 py-1.5 md:py-2 rounded-bl-3xl font-bold text-blue-600 text-[10px] md:text-sm uppercase ring-1 ring-blue-100/50">
+            <div className="absolute top-0 right-0 bg-blue-50 px-3 md:px-4 py-1 rounded-bl-2xl font-bold text-blue-600 text-[9px] md:text-xs uppercase ring-1 ring-blue-100/50">
               {currentQuestion.section}
             </div>
           )}
 
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-800 mb-8 md:mb-10 leading-tight font-display">
+            <h2 className="text-base md:text-lg lg:text-xl font-bold text-slate-800 mb-4 md:mb-5 leading-tight font-display">
               {currentQuestion.questionText}
               {currentQuestion.points && (
-                <span className="ml-2 md:ml-3 text-sm md:text-base font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-xl whitespace-nowrap">
+                <span className="ml-2 text-xs font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-lg whitespace-nowrap">
                   ({currentQuestion.points} điểm)
                 </span>
               )}
             </h2>
 
-            <div className="grid gap-3 md:gap-4">
+            <div className="grid gap-2 md:gap-3">
               {currentQuestion.type === 'fill_in_blank' ? (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-3">
                   <input
                     type="text"
                     value={typedAnswer}
                     onChange={(e) => !isAnswered && setTypedAnswer(e.target.value)}
                     disabled={isAnswered}
                     placeholder="Nhập đáp án của em..."
-                    className={`w-full p-5 md:p-6 rounded-2xl text-xl md:text-2xl font-bold font-display border-4 transition-all outline-none ${
+                    className={`w-full p-3 md:p-4 rounded-xl text-base md:text-lg font-bold font-display border-2 transition-all outline-none ${
                       isAnswered
                         ? typedAnswer.trim().toLowerCase() === currentQuestion.correctAnswer.toLowerCase()
                           ? 'bg-emerald-50 border-emerald-400 text-emerald-700'
@@ -452,7 +452,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                     }}
                   />
                   {isAnswered && typedAnswer.trim().toLowerCase() !== currentQuestion.correctAnswer.toLowerCase() && (
-                    <div className="text-lg md:text-xl font-bold text-emerald-600 mt-1 md:mt-2">
+                    <div className="text-sm md:text-base font-bold text-emerald-600 mt-1">
                       Đáp án gợi ý: <span className="underline">{currentQuestion.correctAnswer}</span>
                     </div>
                   )}
@@ -464,7 +464,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                     whileHover={!isAnswered ? { x: 4 } : {}}
                     whileTap={!isAnswered ? { scale: 0.98 } : {}}
                     onClick={() => handleAnswerSelection(option)}
-                    className={`p-4 md:p-6 rounded-2xl text-left text-lg md:text-xl font-bold font-display border-2 transition-all flex items-center justify-between gap-4 cursor-pointer ${
+                    className={`p-3 md:p-4 rounded-xl text-left text-sm md:text-base font-bold font-display border-[1.5px] transition-all flex items-center justify-between gap-3 cursor-pointer ${
                       isAnswered 
                         ? option === currentQuestion.correctAnswer
                           ? 'bg-emerald-50 border-emerald-400 text-emerald-700'
@@ -472,14 +472,14 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                             ? 'bg-rose-50 border-rose-400 text-rose-700'
                             : 'bg-white border-slate-100 text-slate-300'
                         : selectedAnswer === option
-                          ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-md shadow-blue-50'
+                          ? 'bg-blue-50 border-blue-500 text-blue-700 shadow-sm shadow-blue-50 animate-pulse'
                           : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200 hover:bg-slate-50'
                     }`}
                   >
                     <span className="flex-1">{option}</span>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {isAnswered && option === currentQuestion.correctAnswer && <CheckCircle2 className="text-emerald-500" />}
-                      {isAnswered && option === selectedAnswer && option !== currentQuestion.correctAnswer && <XCircle className="text-rose-500" />}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {isAnswered && option === currentQuestion.correctAnswer && <CheckCircle2 className="text-emerald-500 w-5 h-5" />}
+                      {isAnswered && option === selectedAnswer && option !== currentQuestion.correctAnswer && <XCircle className="text-rose-500 w-5 h-5" />}
                     </div>
                   </motion.button>
                 ))
@@ -487,20 +487,20 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
             </div>
           </div>
 
-          <div className="mt-8 md:mt-12 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4 text-center md:text-left">
+          <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 text-center md:text-left">
             <AnimatePresence>
               {isAnswered ? (
                 <motion.div 
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className={`flex-1 flex items-center gap-3 p-4 md:p-5 rounded-2xl md:rounded-3xl ${
-                    feedback === "correct" ? 'bg-emerald-50 text-emerald-800 border border-emerald-100' : 'bg-rose-50 text-rose-800 border border-rose-100'
+                  className={`flex-1 flex items-center gap-2 p-3 rounded-xl border ${
+                    feedback === "correct" ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-rose-50 text-rose-800 border-rose-100'
                   }`}
                 >
-                   <div className={`p-2 rounded-xl shrink-0 ${feedback === "correct" ? 'bg-emerald-100' : 'bg-rose-100'}`}>
-                     {feedback === "correct" ? <Trophy size={20} className="md:w-6 md:h-6" /> : <BrainCircuit size={20} className="md:w-6 md:h-6" />}
+                   <div className={`p-1.5 rounded-lg shrink-0 ${feedback === "correct" ? 'bg-emerald-100' : 'bg-rose-100'}`}>
+                     {feedback === "correct" ? <Trophy size={16} className="md:w-5 md:h-5 text-emerald-600" /> : <BrainCircuit size={16} className="md:w-5 md:h-5 text-rose-600" />}
                    </div>
-                   <span className="font-bold text-sm md:text-lg leading-tight">{currentQuestion.explanation}</span>
+                   <span className="font-bold text-xs md:text-sm leading-tight">{currentQuestion.explanation}</span>
                 </motion.div>
               ) : <div className="flex-1 hidden md:block" />}
             </AnimatePresence>
@@ -508,7 +508,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
             <button
               onClick={isAnswered ? nextQuestion : checkAnswer}
               disabled={currentQuestion.type === 'fill_in_blank' ? !typedAnswer.trim() : !selectedAnswer}
-              className={`w-full md:w-auto px-8 md:px-12 py-4 md:py-5 rounded-2xl font-display font-black text-lg md:text-xl transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer ${
+              className={`w-full md:w-auto px-6 md:px-8 py-2.5 md:py-3.5 rounded-xl font-display font-black text-sm md:text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer ${
                 (currentQuestion.type === 'fill_in_blank' ? !typedAnswer.trim() : !selectedAnswer)
                   ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' 
                   : isAnswered 
@@ -517,7 +517,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
               }`}
             >
               {isAnswered ? (currentIndex === questions.length - 1 ? "Xem kết quả" : "Tiếp theo") : "Kiểm tra"}
-              <ArrowRight size={20} className="md:w-6 md:h-6" />
+              <ArrowRight size={18} className="md:w-5 md:h-5" />
             </button>
           </div>
         </motion.div>

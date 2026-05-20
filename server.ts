@@ -1,13 +1,16 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, ThinkingLevel } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 const app = express();
 const PORT = 3000;
+
+// Simple In-memory cache for generated questions to guarantee instant repeat-generation speed
+const questionsCache = new Map<string, any>();
 
 // Initialize Gemini AI
 const ai = new GoogleGenAI({
@@ -30,6 +33,13 @@ app.use((req, res, next) => {
 // API: Generate Questions
 app.post("/api/generate-questions", async (req, res) => {
   const { grade, subject, topic, difficulty, count = 5, mode = "normal" } = req.body;
+
+  // Simple key for cache lookup
+  const cacheKey = `${grade}_${subject}_${topic || 'all'}_${difficulty}_${count}_${mode}`;
+  if (questionsCache.has(cacheKey)) {
+    console.log(`[Cache Hit] Serving cached questions for key: ${cacheKey}`);
+    return res.json(questionsCache.get(cacheKey));
+  }
 
   try {
     const isSemesterReview = ["semester_review", "midterm_review", "final_review", "mock_exam"].includes(mode);
@@ -95,6 +105,9 @@ app.post("/api/generate-questions", async (req, res) => {
       contents: prompt,
       config: {
         responseMimeType: "application/json",
+        thinkingConfig: {
+          thinkingLevel: ThinkingLevel.LOW
+        },
         responseSchema: {
           type: Type.OBJECT,
           properties: {
@@ -153,6 +166,9 @@ app.post("/api/generate-questions", async (req, res) => {
         return cleaned;
       });
     }
+
+    // Save to Cache for instant retrieve next time
+    questionsCache.set(cacheKey, data);
 
     console.log("Generated questions successfully");
     res.json(data);

@@ -88,20 +88,20 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
         <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-stretch sm:items-center">
           <button 
             onClick={onRestart}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 md:px-12 py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl transition-all shadow-lg hover:shadow-blue-200 flex items-center justify-center gap-2 md:gap-3"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-8 md:px-12 py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl transition-all shadow-lg hover:shadow-blue-200 flex items-center justify-center gap-2 md:gap-3 cursor-pointer"
           >
             <RotateCcw size={20} className="md:w-6 md:h-6" /> Làm lại
           </button>
           <button 
             onClick={onGoHome}
-            className="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-100 px-8 md:px-12 py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl transition-all shadow-sm flex items-center justify-center gap-2 md:gap-3"
+            className="bg-white hover:bg-slate-50 text-slate-700 border-2 border-slate-100 px-8 md:px-12 py-4 md:py-5 rounded-2xl font-black text-lg md:text-xl transition-all shadow-sm flex items-center justify-center gap-2 md:gap-3 cursor-pointer"
           >
             <ArrowLeft size={20} className="md:w-6 md:h-6" /> Về trang chủ
           </button>
         </div>
 
         <div className="mt-8 md:mt-12 flex flex-wrap justify-center items-center gap-3 md:gap-4">
-          <button className="p-4 md:p-5 rounded-2xl bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-blue-500 transition-all border border-slate-100">
+          <button className="p-4 md:p-5 rounded-2xl bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-blue-500 transition-all border border-slate-100 cursor-pointer">
             <Share2 size={20} className="md:w-6 md:h-6" />
           </button>
           <div className={`flex items-center gap-2 md:gap-3 px-6 md:px-8 py-3 md:py-4 rounded-2xl font-bold text-sm md:text-base border transition-all ${saving ? 'bg-slate-50 text-slate-400 border-slate-200' : 'bg-emerald-50 text-emerald-700 border-emerald-100'}`}>

@@ -4,7 +4,7 @@ export type Subject = "Toán" | "Tiếng Việt" | "Tiếng Anh";
 
 export type QuestionType = "multiple_choice" | "fill_in_blank" | "drag_drop" | "matching";
 
-export type PracticeMode = "normal" | "semester_review" | "topic_focus";
+export type PracticeMode = "normal" | "semester_review" | "topic_focus" | "mock_exam" | "midterm_review" | "final_review";
 
 export interface PracticeConfig {
   grade: Grade;
@@ -13,6 +13,7 @@ export interface PracticeConfig {
   topic?: string;
   count: number;
   difficulty: string;
+  duration?: number; // In minutes
 }
 
 export interface Question {

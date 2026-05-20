@@ -21,6 +21,12 @@ const ai = new GoogleGenAI({
 
 app.use(express.json());
 
+// Add COOP header for Firebase Auth popups
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
+
 // API: Generate Questions
 app.post("/api/generate-questions", async (req, res) => {
   const { grade, subject, topic, difficulty, count = 5 } = req.body;

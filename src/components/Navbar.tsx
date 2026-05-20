@@ -17,13 +17,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
     <>
       <button 
         onClick={() => { onHomeClick(); setIsMenuOpen(false); }}
-        className="hover:text-blue-600 flex items-center gap-1.5 transition-colors"
+        className="hover:text-blue-600 flex items-center gap-1.5 transition-colors cursor-pointer"
       >
         <Home size={18} /> Trang chủ
       </button>
       <button 
         onClick={() => { onLeaderboardClick(); setIsMenuOpen(false); }}
-        className="hover:text-blue-500 flex items-center gap-1.5 transition-colors"
+        className="hover:text-blue-500 flex items-center gap-1.5 transition-colors cursor-pointer"
       >
         <Trophy size={18} /> Xếp hạng
       </button>
@@ -36,7 +36,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
             element?.scrollIntoView({ behavior: 'smooth' });
           }, 100);
         }}
-        className="hover:text-blue-500 flex items-center gap-1.5 transition-colors"
+        className="hover:text-blue-500 flex items-center gap-1.5 transition-colors cursor-pointer"
       >
         <Star size={18} /> Chuyên đề
       </button>
@@ -70,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
                 </div>
                 <button 
                   onClick={() => logout()}
-                  className="w-9 h-9 md:w-10 md:h-10 bg-blue-500 rounded-full border-2 border-white overflow-hidden flex items-center justify-center text-white text-xs hover:bg-red-500 transition-colors group relative"
+                  className="w-9 h-9 md:w-10 md:h-10 bg-blue-500 rounded-full border-2 border-white overflow-hidden flex items-center justify-center text-white text-xs hover:bg-red-500 transition-colors group relative cursor-pointer"
                   title="Đăng xuất"
                 >
                   <User size={18} />
@@ -79,7 +79,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
             ) : (
               <button 
                 onClick={signInWithGoogle}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-sm md:text-base transition-all shadow-sm flex items-center gap-2"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-sm md:text-base transition-all shadow-sm flex items-center gap-2 cursor-pointer"
               >
                 <span className="hidden sm:inline">Đăng nhập với Google</span>
                 <span className="sm:hidden">Đăng nhập</span>
@@ -87,7 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
             )}
 
             <button 
-              className="lg:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl"
+              className="lg:hidden p-2 text-slate-600 hover:bg-slate-50 rounded-xl cursor-pointer"
               onClick={() => setIsMenuOpen(true)}
             >
               <Menu size={24} />
@@ -119,7 +119,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
                   <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center text-xl">🎓</div>
                   <span className="font-bold text-blue-600">TIỂU HỌC SMART</span>
                 </div>
-                <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-slate-100 rounded-full">
+                <button onClick={() => setIsMenuOpen(false)} className="p-2 hover:bg-slate-100 rounded-full cursor-pointer">
                   <X size={24} className="text-slate-400" />
                 </button>
               </div>
@@ -132,14 +132,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
                 {user ? (
                   <button 
                     onClick={() => { logout(); setIsMenuOpen(false); }}
-                    className="w-full py-4 text-center text-red-500 font-bold border-2 border-red-50 rounded-2xl"
+                    className="w-full py-4 text-center text-red-500 font-bold border-2 border-red-50 rounded-2xl cursor-pointer"
                   >
                     Đăng xuất tài khoản
                   </button>
                 ) : (
                   <button 
                     onClick={() => { signInWithGoogle(); setIsMenuOpen(false); }}
-                    className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-100"
+                    className="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl shadow-lg shadow-blue-100 cursor-pointer"
                   >
                     Đăng nhập ngay
                   </button>

@@ -18,6 +18,27 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
   const [score, setScore] = useState(0);
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number | null>(config.duration ? config.duration * 60 : null);
+
+  useEffect(() => {
+    if (timeLeft === null) return;
+    if (timeLeft <= 0) {
+      onFinish(score);
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(t => (t !== null ? t - 1 : null));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     generateQuestions();
@@ -130,7 +151,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
     <div className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-10">
       <div className="text-center mb-6 md:mb-8">
         <h1 className="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tighter">
-          {config.mode === 'semester_review' ? `Đề Ôn Tập Học Kỳ ${config.subject} - Đề Số 1` : `Luyện tập: ${config.subject}`}
+          {config.topic || (config.mode === 'semester_review' ? `Ôn Tập Học Kỳ ${config.subject}` : `Luyện tập: ${config.subject}`)}
         </h1>
         {config.mode === 'topic_focus' && <p className="text-blue-600 font-bold text-sm md:text-base">Chuyên đề: {config.topic}</p>}
       </div>
@@ -143,6 +164,11 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
           <div className="bg-blue-600 rounded-2xl px-4 md:px-6 py-2 md:py-3 shadow-md shadow-blue-100 shrink-0">
             <span className="text-white font-bold font-display text-lg md:text-xl">Điểm: {score}</span>
           </div>
+          {timeLeft !== null && (
+            <div className={`rounded-2xl px-4 md:px-6 py-2 md:py-3 shadow-sm border shrink-0 flex items-center gap-2 ${timeLeft < 300 ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
+              <span className="font-bold font-display text-lg md:text-xl">{formatTime(timeLeft)}</span>
+            </div>
+          )}
         </div>
         <div className="w-full sm:flex-1 sm:max-w-xs h-3 bg-slate-100 rounded-full overflow-hidden">
           <motion.div 
@@ -210,7 +236,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                   whileHover={!isAnswered ? { x: 4 } : {}}
                   whileTap={!isAnswered ? { scale: 0.98 } : {}}
                   onClick={() => handleAnswerSelection(option)}
-                  className={`p-4 md:p-6 rounded-2xl text-left text-lg md:text-xl font-bold font-display border-2 transition-all flex items-center justify-between gap-4 ${
+                  className={`p-4 md:p-6 rounded-2xl text-left text-lg md:text-xl font-bold font-display border-2 transition-all flex items-center justify-between gap-4 cursor-pointer ${
                     isAnswered 
                       ? option === currentQuestion.correctAnswer
                         ? 'bg-emerald-50 border-emerald-400 text-emerald-700'
@@ -254,7 +280,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
           <button
             onClick={isAnswered ? nextQuestion : checkAnswer}
             disabled={currentQuestion.type === 'fill_in_blank' ? !typedAnswer.trim() : !selectedAnswer}
-            className={`w-full md:w-auto px-8 md:px-12 py-4 md:py-5 rounded-2xl font-display font-black text-lg md:text-xl transition-all shadow-lg flex items-center justify-center gap-3 ${
+            className={`w-full md:w-auto px-8 md:px-12 py-4 md:py-5 rounded-2xl font-display font-black text-lg md:text-xl transition-all shadow-lg flex items-center justify-center gap-3 cursor-pointer ${
               (currentQuestion.type === 'fill_in_blank' ? !typedAnswer.trim() : !selectedAnswer)
                 ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' 
                 : isAnswered 

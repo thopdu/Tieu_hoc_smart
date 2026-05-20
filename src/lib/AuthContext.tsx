@@ -23,17 +23,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const docRef = doc(db, 'users', uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setProfile(docSnap.data() as UserProfile);
+        const data = docSnap.data() as UserProfile;
+        const emailLower = (data.email || '').toLowerCase();
+        const isAdmin = emailLower === 'pvantho@pdu.edu.vn' || emailLower.includes('admin');
+        const role = data.role || (isAdmin ? 'admin' : 'user');
+        const membership = data.membership || 'regular';
+        
+        const updatedData = { ...data, role, membership };
+        if (!data.role || !data.membership) {
+          await setDoc(docRef, { role, membership }, { merge: true });
+        }
+        setProfile(updatedData);
       } else {
         // Initialize basic profile for new users
+        const email = auth.currentUser?.email || '';
+        const emailLower = email.toLowerCase();
+        const isAdmin = emailLower === 'pvantho@pdu.edu.vn' || emailLower.includes('admin');
         const newProfile: UserProfile = {
           uid,
           displayName: auth.currentUser?.displayName || 'Học sinh',
-          email: auth.currentUser?.email || '',
+          email: email,
           grade: 1,
           totalPoints: 0,
           badges: [],
-          createdAt: Date.now()
+          createdAt: Date.now(),
+          membership: 'regular',
+          role: isAdmin ? 'admin' : 'user'
         };
         await setDoc(docRef, newProfile);
         setProfile(newProfile);

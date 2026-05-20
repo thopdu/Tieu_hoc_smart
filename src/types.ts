@@ -1,6 +1,6 @@
 export type Grade = 1 | 2 | 3 | 4 | 5;
 
-export type Subject = "Toán" | "Tiếng Việt" | "Tiếng Anh";
+export type Subject = "Toán" | "Tiếng Việt" | "Tiếng Anh" | "Tin học";
 
 export type QuestionType = "multiple_choice" | "fill_in_blank" | "drag_drop" | "matching";
 
@@ -26,6 +26,10 @@ export interface Question {
   image?: string;
   section?: string;
   points?: number;
+  readingPassage?: {
+    title: string;
+    content: string;
+  };
 }
 
 export interface UserProfile {
@@ -38,6 +42,8 @@ export interface UserProfile {
   badges: string[];
   createdAt: number;
   lastSession?: PracticeConfig;
+  membership?: 'regular' | 'diamond';
+  role?: 'admin' | 'user';
 }
 
 export interface ExamResult {

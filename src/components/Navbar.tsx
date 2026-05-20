@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BookOpen, Trophy, User, Home, Star, Menu, X } from 'lucide-react';
+import { BookOpen, Trophy, User, Home, Star, Menu, X, ShieldAlert } from 'lucide-react';
 import { useAuth } from '../lib/AuthContext';
 import { signInWithGoogle, logout } from '../lib/firebase';
 import { motion, AnimatePresence } from 'motion/react';
@@ -7,9 +7,11 @@ import { motion, AnimatePresence } from 'motion/react';
 interface NavbarProps {
   onLeaderboardClick: () => void;
   onHomeClick: () => void;
+  onProfileClick: () => void;
+  onAdminClick: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick, onProfileClick, onAdminClick }) => {
   const { user, profile, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -27,6 +29,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
       >
         <Trophy size={18} /> Xếp hạng
       </button>
+      {user && (
+        <button 
+          onClick={() => { onProfileClick(); setIsMenuOpen(false); }}
+          className="hover:text-blue-500 flex items-center gap-1.5 transition-colors cursor-pointer"
+        >
+          <BookOpen size={18} /> Học bạ AI
+        </button>
+      )}
       <button 
         onClick={() => {
           onHomeClick();
@@ -40,6 +50,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
       >
         <Star size={18} /> Chuyên đề
       </button>
+      {profile?.role === 'admin' && (
+        <button 
+          onClick={() => { onAdminClick(); setIsMenuOpen(false); }}
+          className="text-orange-600 hover:text-orange-700 flex items-center gap-1.5 transition-colors cursor-pointer font-bold"
+        >
+          <ShieldAlert size={18} /> Quản trị
+        </button>
+      )}
     </>
   );
 
@@ -64,8 +82,12 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
               <div className="w-8 h-8 rounded-full border-2 border-blue-100 border-t-blue-500 animate-spin" />
             ) : user ? (
               <div className="flex items-center gap-2 md:gap-3 bg-slate-50 py-1.5 px-2 md:px-3 rounded-full border border-slate-200">
-                <div className="text-right hidden sm:block">
-                  <p className="text-[10px] md:text-xs font-bold text-slate-800 leading-none">{profile?.displayName}</p>
+                <div 
+                  onClick={onProfileClick}
+                  className="text-right hidden sm:block cursor-pointer hover:text-blue-600 transition-colors"
+                  title="Xem Học bạ AI"
+                >
+                  <p className="text-[10px] md:text-xs font-bold leading-none">{profile?.displayName}</p>
                   <p className="text-[8px] md:text-[10px] text-green-600 font-bold uppercase mt-0.5">Lớp {profile?.grade} • {profile?.totalPoints} XP</p>
                 </div>
                 <button 
@@ -81,8 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onLeaderboardClick, onHomeClick 
                 onClick={signInWithGoogle}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 md:px-8 py-2 md:py-2.5 rounded-full font-bold text-sm md:text-base transition-all shadow-sm flex items-center gap-2 cursor-pointer"
               >
-                <span className="hidden sm:inline">Đăng nhập với Google</span>
-                <span className="sm:hidden">Đăng nhập</span>
+                <span>Đăng nhập</span>
               </button>
             )}
 

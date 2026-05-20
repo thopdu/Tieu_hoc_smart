@@ -10,6 +10,8 @@ import { Dashboard } from './components/Dashboard';
 import { PracticeSession } from './components/PracticeSession';
 import { ResultsView } from './components/ResultsView';
 import { Leaderboard } from './components/Leaderboard';
+import { StudentProfile } from './components/StudentProfile';
+import { AdminPanel } from './components/AdminPanel';
 import { AuthModal } from './components/AuthModal';
 import { Grade, Subject, PracticeConfig } from './types';
 
@@ -18,7 +20,7 @@ import { db } from './lib/firebase';
 
 function AppContent() {
   const { user, profile, refreshProfile } = useAuth();
-  const [view, setView] = useState<"dashboard" | "practice" | "results" | "leaderboard">("dashboard");
+  const [view, setView] = useState<"dashboard" | "practice" | "results" | "leaderboard" | "profile" | "admin">("dashboard");
   const [lastScore, setLastScore] = useState(0);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [config, setConfig] = useState<PracticeConfig>({
@@ -57,7 +59,12 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-sky-50/50 flex flex-col">
-      <Navbar onLeaderboardClick={() => setView("leaderboard")} onHomeClick={() => setView("dashboard")} />
+      <Navbar 
+        onLeaderboardClick={() => setView("leaderboard")} 
+        onHomeClick={() => setView("dashboard")} 
+        onProfileClick={() => setView("profile")}
+        onAdminClick={() => setView("admin")}
+      />
       
       <main className="flex-1 pb-20">
         {view === "dashboard" && (
@@ -66,6 +73,14 @@ function AppContent() {
 
         {view === "leaderboard" && (
           <Leaderboard />
+        )}
+
+        {view === "profile" && (
+          <StudentProfile />
+        )}
+
+        {view === "admin" && (
+          <AdminPanel />
         )}
 
         {view === "practice" && (
@@ -85,10 +100,9 @@ function AppContent() {
         )}
       </main>
 
-      <footer className="bg-white border-t border-slate-100 py-10 px-6">
+      <footer className="bg-white border-t border-slate-100 py-5 px-6">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-slate-400 font-medium">© 2026 Hành Trang Học Tập. Đồng hành cùng học sinh Việt Nam.</p>
-          <p className="text-xs text-slate-300 mt-2 italic">Kết nối tri thức và cuộc sống</p>
+          <p className="text-slate-400 text-sm font-medium">© 2026 Tiểu Học Smart. Đồng hành cùng học sinh lớp lá đến lớp 5.</p>
         </div>
       </footer>
 

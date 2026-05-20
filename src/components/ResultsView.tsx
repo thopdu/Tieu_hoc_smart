@@ -32,7 +32,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
           grade,
           score,
           xpEarned,
-          completedAt: Date.now()
+          completedAt: Date.now(),
+          topic: config.topic || null,
+          mode: config.mode
         });
 
         // Update user's total points

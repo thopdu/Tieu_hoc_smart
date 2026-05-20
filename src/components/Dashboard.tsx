@@ -43,6 +43,105 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
   const mathTopics = ["Phép cộng, phép trừ", "Phép nhân, phép chia", "Hình học & Đo lường", "Bài toán có lời văn", "Số học & So sánh"];
   const englishTopics = ["Vocabulary (Từ vựng)", "Grammar (Ngữ pháp)", "Reading (Đọc hiểu)", "Listening (Nghe hiểu)", "Phonics (Phát âm)"];
 
+  const getSubjectTopics = (grade: Grade, subject: Subject): string[] => {
+    if (subject === "Tiếng Việt") {
+      switch (grade) {
+        case 1:
+          return [
+            "Học âm, vần & Thanh điệu (KNTT)",
+            "Đọc trơn & Viết chính tả chữ ghi âm",
+            "Từ ngữ & Câu đơn giản chủ đề Gia đình",
+            "Chủ đề: Nhà rông Tây Nguyên & Lễ hội",
+            "Chủ đề: Loài vật quanh ta & Thiên nhiên"
+          ];
+        case 2:
+          return [
+            "Chủ điểm: Em học lớp Hai (KNTT)",
+            "Chủ điểm: Mái gia đình yêu thương (KNTT)",
+            "Chủ điểm: Hành tinh xanh & Cuộc sống",
+            "Luyện từ & Câu: Sự vật, hoạt động, đặc điểm",
+            "Mẫu câu ai làm gì? ai thế nào? ai là gì?"
+          ];
+        case 3:
+          return [
+            "Chủ điểm: Mái trường thân yêu (KNTT)",
+            "Chủ điểm: Mái ấm gia đình & Bạn bè (KNTT)",
+            "Chủ điểm: Đất nước ngàn năm tươi đẹp",
+            "Biện pháp tu từ: So sánh & Nhân hóa",
+            "Từ ngữ chỉ đặc điểm, hoạt động, trạng thái"
+          ];
+        case 4:
+          return [
+            "Chủ điểm: Trên những nẻo đường đất nước",
+            "Chủ điểm: Trải nghiệm & Khám phá mới (KNTT)",
+            "Chủ điểm: Chắp cánh ước mơ tuổi thơ (KNTT)",
+            "Luyện từ & Câu: Danh, động, tính từ",
+            "Biện pháp nhân hóa & Các loại dấu câu",
+            "Cảm thụ văn học & Kể chuyện sáng tạo"
+          ];
+        case 5:
+        default:
+          return [
+            "Chủ điểm: Thế giới quanh ta & Tuổi thơ (KNTT)",
+            "Chủ điểm: Giữ lấy màu xanh đại ngàn",
+            "Luyện từ & Câu: Đại từ, Quan hệ từ",
+            "Từ đồng nghĩa, từ trái nghĩa, từ đồng âm",
+            "Liên kết câu & Cấu trúc câu ghép (KNTT)",
+            "Cảm thụ văn học & Viết văn miêu tả"
+          ];
+      }
+    }
+    if (subject === "Tiếng Anh") {
+      return englishTopics;
+    }
+    if (subject === "Tin học") {
+      switch (grade) {
+        case 1:
+          return [
+            "Trò chơi luyện chuột cơ bản",
+            "Nhận diện máy tính quanh em"
+          ];
+        case 2:
+          return [
+            "Làm quen với máy tính: Bàn phím & Chuột",
+            "Tư thế ngồi học và An toàn về điện",
+            "Xem tin tức và Giải trí lành mạnh trên Internet",
+            "Khám phá thế giới số & Thiết bị thông minh",
+            "Phần mềm học tập: Tập vẽ, luyện gõ phím"
+          ];
+        case 3:
+          return [
+            "Chủ đề A: Máy tính và em (KNTT)",
+            "Chủ đề B: Mạng máy tính và Internet cơ bản",
+            "Chủ đề C: Tổ chức lưu trữ, tìm kiếm thông tin",
+            "Chủ đề D: Đạo đức, pháp luật & Văn hóa môi trường số",
+            "Chủ đề E: Làm quen phần mềm Trình chiếu KNTT",
+            "Chủ đề F: Giải quyết vấn đề với sự trợ giúp máy tính"
+          ];
+        case 4:
+          return [
+            "Chủ đề A: Phần cứng & Phần mềm máy tính (KNTT)",
+            "Chủ đề B: Gõ bàn phím đúng cách & Bảo vệ thông tin",
+            "Chủ đề C: Sử dụng Internet để tìm thông tin hữu ích",
+            "Chủ đề D: Tạo bài trình chiếu đa phương tiện KNTT",
+            "Chủ đề E: Làm quen ngôn ngữ lập trình Scratch",
+            "Chủ đề E: Lập trình nhân vật chuyển động & Vẽ hình"
+          ];
+        case 5:
+        default:
+          return [
+            "Chủ đề A: Máy tính và em - Thu thập thông tin",
+            "Chủ đề B: Các dịch vụ Internet tiện ích & An toàn mạng",
+            "Chủ đề C: Sắp xếp thông tin trong máy tính",
+            "Chủ đề D: Tôn trọng quyền tác giả và bảo mật",
+            "Chủ đề E: Trình bày đa phương tiện & Excel căn bản",
+            "Chủ đề F: Lập trình Scratch: Sử dụng biến và thuật toán"
+          ];
+      }
+    }
+    return mathTopics;
+  };
+
   const startNormal = (grade: Grade, subject: Subject) => {
     onStart({
       grade,
@@ -191,7 +290,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                 className="space-y-8 md:space-y-10"
               >
                 {/* Subject Cards */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
                   <div 
                     onClick={() => setSelectedSubject("Toán")}
                     className={`p-5 md:p-6 rounded-3xl border transition-all cursor-pointer group flex items-center gap-4 ${
@@ -242,6 +341,25 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                       <p className={`text-xs md:text-sm font-medium ${selectedSubject === "Tiếng Anh" ? 'text-pink-50' : 'text-pink-600 opacity-80'}`}>Luyện từ vựng</p>
                     </div>
                   </div>
+
+                  {selectedGrade !== 1 && (
+                    <div 
+                      onClick={() => setSelectedSubject("Tin học")}
+                      className={`p-5 md:p-6 rounded-3xl border transition-all cursor-pointer group flex items-center gap-4 ${
+                        selectedSubject === "Tin học" 
+                        ? 'bg-teal-500 text-white border-teal-600 shadow-lg shadow-teal-100' 
+                        : 'bg-teal-50 border-teal-100 hover:bg-white hover:shadow-lg hover:border-teal-200'
+                      }`}
+                    >
+                      <div className={`w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center text-2xl md:text-3xl shadow-md transition-transform group-hover:scale-110 ${
+                        selectedSubject === "Tin học" ? 'bg-white/20' : 'bg-teal-500 text-white'
+                      }`}>💻</div>
+                      <div>
+                        <h4 className={`font-bold text-lg md:text-xl font-display ${selectedSubject === "Tin học" ? 'text-white' : 'text-teal-700'}`}>Tin học</h4>
+                        <p className={`text-xs md:text-sm font-medium ${selectedSubject === "Tin học" ? 'text-teal-50' : 'text-teal-600 opacity-80'}`}>Kết nối tri thức</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Sub-categories Section */}
@@ -335,19 +453,46 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
 
                 {/* Topics Container */}
                 <div id="topics-section" className="space-y-12 pt-8">
-                  {/* Math Topics Section */}
+                  {/* Math/Vietnamese/English Topics Section */}
                   <section>
                     <div className="flex items-center justify-between mb-6 px-1">
                       <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
+                        {(!selectedSubject || selectedSubject === "Toán") && (
+                          <>
+                            <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
+                          </>
+                        )}
+                        {selectedSubject === "Tiếng Việt" && (
+                          <>
+                            <BookText size={14} className="text-blue-500" /> Tiếng Việt - Sách Kết nối tri thức
+                          </>
+                        )}
+                        {selectedSubject === "Tiếng Anh" && (
+                          <>
+                            <Sparkles size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
+                          </>
+                        )}
+                        {selectedSubject === "Tin học" && (
+                          <>
+                            <BookText size={14} className="text-teal-500" /> Tin học - Sách Kết nối tri thức
+                          </>
+                        )}
                       </h3>
                     </div>
                     <div className="flex flex-wrap gap-2 md:gap-3">
-                      {(selectedSubject === "Tiếng Anh" ? englishTopics : mathTopics).map((topic, i) => (
+                      {getSubjectTopics(selectedGrade || 1, selectedSubject || "Toán").map((topic, i) => (
                         <button 
                           key={i}
-                          onClick={() => startTopic(selectedGrade, selectedSubject || "Toán", topic)}
-                          className="bg-white border border-slate-100 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-slate-600 hover:border-blue-500 hover:text-blue-600 transition-all shadow-sm text-sm md:text-base cursor-pointer"
+                          onClick={() => startTopic(selectedGrade || 1, selectedSubject || "Toán", topic)}
+                          className={`bg-white border border-slate-100 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-slate-600 transition-all shadow-sm text-sm md:text-base cursor-pointer ${
+                            (!selectedSubject || selectedSubject === "Toán")
+                              ? "hover:border-orange-500 hover:text-orange-600"
+                              : selectedSubject === "Tiếng Việt"
+                              ? "hover:border-blue-500 hover:text-blue-600"
+                              : selectedSubject === "Tiếng Anh"
+                              ? "hover:border-pink-500 hover:text-pink-600"
+                              : "hover:border-teal-500 hover:text-teal-600"
+                          }`}
                         >
                           {topic}
                         </button>

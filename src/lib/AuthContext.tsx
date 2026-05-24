@@ -27,11 +27,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const emailLower = (data.email || '').toLowerCase();
         const isAdmin = emailLower === 'pvantho@pdu.edu.vn' || emailLower.includes('admin');
         const role = data.role || (isAdmin ? 'admin' : 'user');
-        const membership = data.membership || 'regular';
         
-        const updatedData = { ...data, role, membership };
-        if (!data.role || !data.membership) {
-          await setDoc(docRef, { role, membership }, { merge: true });
+        let membership = data.membership || 'regular';
+        let membershipExpiresAt = data.membershipExpiresAt;
+        let membershipActivatedAt = data.membershipActivatedAt;
+
+        // Auto transition expired diamond membership to regular
+        let needsDbUpdate = !data.role || !data.membership;
+        if (membership === 'diamond' && membershipExpiresAt && membershipExpiresAt < Date.now()) {
+          membership = 'regular';
+          membershipExpiresAt = undefined;
+          membershipActivatedAt = undefined;
+          needsDbUpdate = true;
+        }
+
+        const updatedData = { 
+          ...data, 
+          role, 
+          membership,
+          membershipExpiresAt,
+          membershipActivatedAt
+        };
+
+        if (needsDbUpdate) {
+          await setDoc(docRef, { 
+            role, 
+            membership,
+            membershipExpiresAt: membership === 'diamond' ? (membershipExpiresAt || null) : null,
+            membershipActivatedAt: membership === 'diamond' ? (membershipActivatedAt || null) : null
+          }, { merge: true });
         }
         setProfile(updatedData);
       } else {

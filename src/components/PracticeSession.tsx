@@ -5,7 +5,7 @@ import { Grade, Subject, Question, PracticeConfig } from '../types';
 
 interface PracticeSessionProps {
   config: PracticeConfig;
-  onFinish: (score: number) => void;
+  onFinish: (score: number, answersLog?: any[]) => void;
 }
 
 export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFinish }) => {
@@ -19,6 +19,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
   const [loading, setLoading] = useState(true);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
   const [timeLeft, setTimeLeft] = useState<number | null>(config.duration ? config.duration * 60 : null);
+  const [answersLog, setAnswersLog] = useState<any[]>([]);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [speechRate, setSpeechRate] = useState(1.0);
@@ -118,7 +119,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
   useEffect(() => {
     if (timeLeft === null) return;
     if (timeLeft <= 0) {
-      onFinish(score);
+      onFinish(config.mode === 'mock_exam' ? score * 10 : score, answersLog);
       return;
     }
 
@@ -153,7 +154,23 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
       
       const data = await resp.json();
       if (data.questions && Array.isArray(data.questions)) {
-        setQuestions(data.questions);
+        const sanitizedQuestions = data.questions.map((q: any) => {
+          const clean = (str: any): any => {
+            if (typeof str !== "string") return str;
+            return str
+              .replace(/(\d+)\s*\*\s*(\d+)/g, "$1 x $2")
+              .replace(/(\d+)\s*\*\s*([A-Za-z]+)/gi, "$1 x $2")
+              .replace(/([A-Za-z]+)\s*\*\s*(\d+)/gi, "$1 x $2");
+          };
+          return {
+            ...q,
+            questionText: clean(q.questionText),
+            options: q.options ? q.options.map((opt: any) => clean(opt)) : undefined,
+            correctAnswer: clean(q.correctAnswer),
+            explanation: clean(q.explanation)
+          };
+        });
+        setQuestions(sanitizedQuestions);
       } else {
         throw new Error("Invalid questions data received");
       }
@@ -169,6 +186,73 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
     setSelectedAnswer(answer);
   };
 
+  const isAnswerCorrect = (userAns: string, correctAns: string): boolean => {
+    if (!userAns || !correctAns) return false;
+    
+    const normUser = userAns.trim().toLowerCase();
+    const normCorrect = correctAns.trim().toLowerCase();
+    if (normUser === normCorrect) return true;
+
+    // For Vietnamese subject and fill in blank, apply fuzzy/semantic matching
+    if (config.subject === "Tiếng Việt") {
+      const cleanText = (str: string) => {
+        return str
+          .toLowerCase()
+          .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "") // remove punctuation
+          .replace(/\s+/g, " ")
+          .trim();
+      };
+
+      const userClean = cleanText(userAns);
+      const correctClean = cleanText(correctAns);
+
+      if (!userClean || !correctClean) return false;
+      
+      // If either fully contains the other
+      if (userClean === correctClean) return true;
+      if (userClean.includes(correctClean)) return true;
+      if (correctClean.includes(userClean) && userClean.length > 3) return true;
+
+      // Word level check: If the correct answer is a single word or 2-word phrase, check if user has both
+      const correctWords = correctClean.split(" ").filter(w => w.length > 0);
+      const userWords = userClean.split(" ").filter(w => w.length > 0);
+
+      if (correctWords.length <= 2) {
+        return correctWords.every(w => userWords.includes(w));
+      }
+
+      // Semantic keyword overlap check for sentences or longer phrases
+      const stopWords = new Set(["và", "thì", "là", "ở", "của", "có", "một", "nhưng", "được", "các", "những", "cho", "để"]);
+      const keyWords = correctWords.filter(w => !stopWords.has(w));
+      
+      if (keyWords.length > 0) {
+        const matchedKeyWords = keyWords.filter(w => userClean.includes(w));
+        const matchRatio = matchedKeyWords.length / keyWords.length;
+        if (matchRatio >= 0.6) {
+          return true;
+        }
+      }
+
+      // Check for overlapping 2-word groups
+      if (correctWords.length >= 3) {
+        let phraseMatches = 0;
+        let totalPhrases = 0;
+        for (let i = 0; i < correctWords.length - 1; i++) {
+          const phrase = `${correctWords[i]} ${correctWords[i+1]}`;
+          totalPhrases++;
+          if (userClean.includes(phrase)) {
+            phraseMatches++;
+          }
+        }
+        if (totalPhrases > 0 && (phraseMatches / totalPhrases) >= 0.5) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  };
+
   const checkAnswer = () => {
     let answerToCompare = selectedAnswer;
     if (currentQuestion.type === 'fill_in_blank') {
@@ -178,16 +262,33 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
     if (!answerToCompare && currentQuestion.type !== 'fill_in_blank') return;
     if (currentQuestion.type === 'fill_in_blank' && !typedAnswer.trim()) return;
     
-    const isCorrect = answerToCompare?.toLowerCase() === currentQuestion.correctAnswer.toLowerCase();
+    const isCorrect = isAnswerCorrect(answerToCompare || "", currentQuestion.correctAnswer);
     setIsAnswered(true);
     setFeedback(isCorrect ? "correct" : "wrong");
     
+    // Log selected answered details of this question
+    setAnswersLog(prev => [
+      ...prev,
+      {
+        questionText: currentQuestion.questionText,
+        isCorrect,
+        userAnswer: answerToCompare,
+        correctAnswer: currentQuestion.correctAnswer,
+        explanation: currentQuestion.explanation,
+        section: currentQuestion.section || null
+      }
+    ]);
+
     if (isCorrect) {
       if (currentQuestion.points) {
-        setScore(s => Number((s + currentQuestion.points!).toFixed(1)));
+        if (config.mode === 'mock_exam') {
+          setScore(s => Number((s + currentQuestion.points!).toFixed(1)));
+        } else {
+          setScore(s => Number((s + currentQuestion.points! * 10).toFixed(1)));
+        }
       } else {
-        const pointsPerQuestion = 100 / count;
-        setScore(s => Math.round(s + pointsPerQuestion));
+        const pointsPerQuestion = (config.mode === 'mock_exam' ? 10 : 100) / count;
+        setScore(s => Number((s + pointsPerQuestion).toFixed(1)));
       }
     }
   };
@@ -200,7 +301,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
       setIsAnswered(false);
       setFeedback(null);
     } else {
-      onFinish(score);
+      onFinish(config.mode === 'mock_exam' ? score * 10 : score, answersLog);
     }
   };
 
@@ -256,7 +357,9 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
             <span className="text-blue-600 font-bold font-display text-sm md:text-base">Câu {currentIndex + 1}/{questions.length}</span>
           </div>
           <div className="bg-blue-600 rounded-xl px-3 py-1.5 md:py-2 shadow-md shadow-blue-100 shrink-0">
-            <span className="text-white font-bold font-display text-sm md:text-base">Điểm: {score}</span>
+            <span className="text-white font-bold font-display text-sm md:text-base">
+              Điểm: {config.mode === 'mock_exam' ? `${score}/10` : `${score}`}
+            </span>
           </div>
           {timeLeft !== null && (
             <div className={`rounded-xl px-3 py-1.5 md:py-2 shadow-sm border shrink-0 flex items-center gap-1.5 ${timeLeft < 300 ? 'bg-rose-50 border-rose-200 text-rose-600 animate-pulse' : 'bg-slate-50 border-slate-200 text-slate-600'}`}>
@@ -374,9 +477,9 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                         >
                           <span className="text-[10px] font-bold text-blue-500 block mb-1 uppercase">LỜI THOẠI BÀI NGHE (TRANSCRIPT):</span>
                           <p className="text-slate-600 text-sm italic font-medium leading-relaxed whitespace-pre-line">
-                            {currentQuestion.readingPassage.content}
+                            {currentQuestion.readingPassage.content.replace(/\[\s*\]/g, '...')}
                           </p>
-                          <p className="text-[10px] text-emerald-600 font-bold mt-2">💡 Khuyên dùng: Em hãy cố gắng rèn luyện khả năng nghe trước nhé!</p>
+                          <p className="text-[10px] text-emerald-650 font-bold mt-2">💡 Khuyên dùng: Em hãy cố gắng rèn luyện khả năng nghe trước nhé!</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -398,7 +501,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                   {currentQuestion.readingPassage.title}
                 </h3>
                 <div className="text-slate-600 text-xs md:text-sm leading-relaxed whitespace-pre-line font-medium">
-                  {currentQuestion.readingPassage.content}
+                  {currentQuestion.readingPassage.content.replace(/\[\s*\]/g, '...')}
                 </div>
               </div>
             );
@@ -421,7 +524,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
 
           <div>
             <h2 className="text-base md:text-lg lg:text-xl font-bold text-slate-800 mb-4 md:mb-5 leading-tight font-display">
-              {currentQuestion.questionText}
+              {currentQuestion.questionText.replace(/\[\s*\]/g, '...')}
               {currentQuestion.points && (
                 <span className="ml-2 text-xs font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-lg whitespace-nowrap">
                   ({currentQuestion.points} điểm)
@@ -476,7 +579,7 @@ export const PracticeSession: React.FC<PracticeSessionProps> = ({ config, onFini
                           : 'bg-white border-slate-100 text-slate-600 hover:border-blue-200 hover:bg-slate-50'
                     }`}
                   >
-                    <span className="flex-1">{option}</span>
+                    <span className="flex-1">{option.replace(/\[\s*\]/g, '...')}</span>
                     <div className="flex items-center gap-1.5 shrink-0">
                       {isAnswered && option === currentQuestion.correctAnswer && <CheckCircle2 className="text-emerald-500 w-5 h-5" />}
                       {isAnswered && option === selectedAnswer && option !== currentQuestion.correctAnswer && <XCircle className="text-rose-500 w-5 h-5" />}

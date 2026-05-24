@@ -2,17 +2,26 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Trophy, Medal, User, Crown } from 'lucide-react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { UserProfile } from '../types';
+import { useAuth } from '../lib/AuthContext';
 
 export const Leaderboard: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
   const [topUsers, setTopUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
+      if (authLoading) return;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const q = query(collection(db, 'users'), orderBy('totalPoints', 'desc'), limit(10));
+        const path = 'users';
+        const q = query(collection(db, path), orderBy('totalPoints', 'desc'), limit(10));
         const querySnapshot = await getDocs(q);
         const users: UserProfile[] = [];
         querySnapshot.forEach((doc) => {
@@ -21,15 +30,20 @@ export const Leaderboard: React.FC = () => {
         setTopUsers(users);
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
+        try {
+          handleFirestoreError(error, OperationType.LIST, 'users');
+        } catch (e) {
+          // Keep failure logged but don't crash app
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchLeaderboard();
-  }, []);
+  }, [authLoading, user]);
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="flex justify-center py-20">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -89,7 +103,14 @@ export const Leaderboard: React.FC = () => {
 
         {topUsers.length === 0 && (
           <div className="text-center py-20 bg-slate-50 rounded-[3rem] border border-dashed border-slate-200">
-            <p className="text-slate-400">Chưa có dữ liệu xếp hạng. Hãy là người đầu tiên!</p>
+            {user ? (
+              <p className="text-slate-400">Chưa có dữ liệu xếp hạng. Hãy là người đầu tiên!</p>
+            ) : (
+              <div>
+                <p className="text-slate-500 font-bold mb-3">Vui lòng đăng nhập để xem bảng xếp hạng vinh danh nhé!</p>
+                <p className="text-slate-400 text-xs">Các phần thưởng học tập và thử thách thú vị đang chờ đón em.</p>
+              </div>
+            )}
           </div>
         )}
       </div>

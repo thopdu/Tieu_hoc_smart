@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 import { collection, getDocs, doc, updateDoc, query, orderBy } from 'firebase/firestore';
 import { UserProfile } from '../types';
 import { useAuth } from '../lib/AuthContext';
@@ -24,14 +24,34 @@ export const AdminPanel: React.FC = () => {
       const snap = await getDocs(q);
       const fetched: UserProfile[] = [];
       snap.forEach(doc => {
+        const data = doc.data() as UserProfile;
+        let membership = data.membership || 'regular';
+        let membershipExpiresAt = data.membershipExpiresAt;
+        let membershipActivatedAt = data.membershipActivatedAt;
+
+        // Auto transition expired diamond members on display
+        if (membership === 'diamond' && membershipExpiresAt && membershipExpiresAt < Date.now()) {
+          membership = 'regular';
+          membershipExpiresAt = undefined;
+          membershipActivatedAt = undefined;
+        }
+
         fetched.push({
           uid: doc.id,
-          ...doc.data()
+          ...data,
+          membership,
+          membershipExpiresAt,
+          membershipActivatedAt
         } as UserProfile);
       });
       setUsers(fetched);
     } catch (e) {
       console.error("Error fetching admin users:", e);
+      try {
+        handleFirestoreError(e, OperationType.LIST, 'users');
+      } catch (err) {
+        // Log but don't crash the panel
+      }
     } finally {
       setLoading(false);
     }
@@ -44,18 +64,36 @@ export const AdminPanel: React.FC = () => {
   const toggleMembership = async (userId: string, currentVal?: 'regular' | 'diamond') => {
     setUpdatingId(userId);
     const targetStatus = currentVal === 'diamond' ? 'regular' : 'diamond';
+    const now = Date.now();
+    const oneYearLater = now + 365 * 24 * 60 * 60 * 1000;
     try {
       const userRef = doc(db, 'users', userId);
-      await updateDoc(userRef, {
+      const updateData: any = {
         membership: targetStatus
-      });
+      };
+      if (targetStatus === 'diamond') {
+        updateData.membershipActivatedAt = now;
+        updateData.membershipExpiresAt = oneYearLater;
+      } else {
+        updateData.membershipActivatedAt = null;
+        updateData.membershipExpiresAt = null;
+      }
+
+      await updateDoc(userRef, updateData);
       
       // Update local state smoothly
-      setUsers(prev => prev.map(u => u.uid === userId ? { ...u, membership: targetStatus } : u));
+      setUsers(prev => prev.map(u => u.uid === userId ? { 
+        ...u, 
+        membership: targetStatus,
+        membershipActivatedAt: targetStatus === 'diamond' ? now : undefined,
+        membershipExpiresAt: targetStatus === 'diamond' ? oneYearLater : undefined
+      } : u));
       
       setActionMessage({
         type: 'success',
-        text: `Đã thay đổi trạng thái thành công sang ${targetStatus === 'diamond' ? '✨ KIM CƯƠNG' : 'THƯỜNG'}`
+        text: targetStatus === 'diamond'
+          ? `Đã kích hoạt KIM CƯƠNG thành công! (Phí kích hoạt: 100.000 VNĐ · Thời hạn: 1 năm)`
+          : 'Hạ xuống tài khoản THƯỜNG thành công.'
       });
 
       // If updating current user's profile, update context
@@ -253,42 +291,94 @@ export const AdminPanel: React.FC = () => {
 
                       {/* Badge / Status */}
                       <td className="py-4 px-3 text-center">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-wider leading-none ${
-                          isDiamond 
-                            ? 'bg-blue-50 text-blue-600 border-blue-100' 
-                            : 'bg-slate-50 text-slate-400 border-slate-100'
-                        }`}>
-                          {isDiamond ? (
-                            <>
-                              <Gem size={10} className="text-blue-500" /> KIM CƯƠNG
-                            </>
-                          ) : (
-                            'TOÀN DANH'
+                        <div className="flex flex-col items-center gap-1">
+                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black border uppercase tracking-wider leading-none ${
+                            isDiamond 
+                              ? 'bg-blue-50 text-blue-600 border-blue-100' 
+                              : 'bg-slate-50 text-slate-400 border-slate-100'
+                          }`}>
+                            {isDiamond ? (
+                              <>
+                                <Gem size={10} className="text-blue-500" /> KIM CƯƠNG
+                              </>
+                            ) : (
+                              'THƯỜNG'
+                            )}
+                          </span>
+                          {isDiamond && user.membershipExpiresAt && (
+                            <div className="text-[10px] text-slate-400 font-medium">
+                              <p>Hạn dùng: {new Date(user.membershipExpiresAt).toLocaleDateString('vi-VN')}</p>
+                              <p className="text-[9px] text-blue-500 font-extrabold uppercase">
+                                Còn {Math.max(0, Math.ceil((user.membershipExpiresAt - Date.now()) / (1000 * 60 * 60 * 24)))} ngày
+                              </p>
+                            </div>
                           )}
-                        </span>
+                        </div>
                       </td>
 
                       {/* Toggle button */}
                       <td className="py-4 px-3 text-right">
-                        <button
-                          disabled={updatingId === user.uid}
-                          onClick={() => toggleMembership(user.uid, user.membership)}
-                          className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer inline-flex items-center gap-1.5 border ${
-                            isDiamond 
-                              ? 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200' 
-                              : 'bg-emerald-600 outline-none hover:bg-emerald-700 text-white border-emerald-600 shadow-sm active:translate-y-0.5'
-                          }`}
-                        >
-                          {updatingId === user.uid ? (
-                            <RefreshCw size={12} className="animate-spin" />
-                          ) : isDiamond ? (
-                            <span>Hạ xuống thường</span>
-                          ) : (
-                            <>
-                              <Gem size={12} /> Kích hoạt Kim Cương
-                            </>
+                        <div className="flex justify-end gap-2">
+                          {isDiamond && (
+                            <button
+                              disabled={updatingId === user.uid}
+                              onClick={async () => {
+                                setUpdatingId(user.uid);
+                                const currentExpiresAt = user.membershipExpiresAt || Date.now();
+                                const baseTime = currentExpiresAt > Date.now() ? currentExpiresAt : Date.now();
+                                const oneYearLater = baseTime + 365 * 24 * 60 * 60 * 1000;
+                                try {
+                                  const userRef = doc(db, 'users', user.uid);
+                                  await updateDoc(userRef, {
+                                    membershipExpiresAt: oneYearLater
+                                  });
+                                  setUsers(prev => prev.map(u => u.uid === user.uid ? { 
+                                    ...u, 
+                                    membershipExpiresAt: oneYearLater 
+                                  } : u));
+                                  setActionMessage({
+                                    type: 'success',
+                                    text: `Đã gia hạn thành công +1 năm học viên Kim Cương cho học sinh ${user.displayName || "này"}!`
+                                  });
+                                  if (user.uid === profile?.uid) {
+                                    await refreshProfile();
+                                  }
+                                  setTimeout(() => setActionMessage(null), 3000);
+                                } catch (e: any) {
+                                  setActionMessage({ type: 'res', text: 'Lỗi gia hạn: ' + e.message });
+                                } finally {
+                                  setUpdatingId(null);
+                                }
+                              }}
+                              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition-all cursor-pointer inline-flex items-center gap-1 border border-blue-600 shadow-sm active:translate-y-0.5"
+                            >
+                              {updatingId === user.uid ? (
+                                <RefreshCw size={12} className="animate-spin" />
+                              ) : (
+                                <>⚡ Gia hạn +1 năm</>
+                              )}
+                            </button>
                           )}
-                        </button>
+                          <button
+                            disabled={updatingId === user.uid}
+                            onClick={() => toggleMembership(user.uid, user.membership)}
+                            className={`px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer inline-flex items-center gap-1.5 border ${
+                              isDiamond 
+                                ? 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200' 
+                                : 'bg-emerald-600 outline-none hover:bg-emerald-700 text-white border-emerald-600 shadow-sm active:translate-y-0.5'
+                            }`}
+                          >
+                            {updatingId === user.uid ? (
+                              <RefreshCw size={12} className="animate-spin" />
+                            ) : isDiamond ? (
+                              <span>Hạ xuống thường</span>
+                            ) : (
+                              <>
+                                <Gem size={12} /> Kích hoạt Kim Cương (100k/năm)
+                              </>
+                            )}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

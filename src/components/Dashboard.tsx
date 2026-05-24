@@ -4,14 +4,14 @@ import { BookText, Calculator, ChevronRight, GraduationCap, Trophy, Sparkles, Ma
 import { Grade, Subject, PracticeConfig, UserProfile, PracticeMode } from '../types';
 import { useAuth } from '../lib/AuthContext';
 import { collection, limit, orderBy, query, getDocs } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 
 interface PracticeInterfaceProps {
   onStart: (config: PracticeConfig) => void;
 }
 
 export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
-  const { profile } = useAuth();
+  const { profile, user, loading: authLoading } = useAuth();
   const [selectedGrade, setSelectedGrade] = useState<Grade | null>(profile?.grade || null);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [topUsers, setTopUsers] = useState<UserProfile[]>([]);
@@ -24,16 +24,26 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
 
   useEffect(() => {
     const fetchMiniLeaderboard = async () => {
+      if (authLoading) return;
+      if (!user) {
+        setTopUsers([]);
+        return;
+      }
       try {
         const q = query(collection(db, 'users'), orderBy('totalPoints', 'desc'), limit(3));
         const snap = await getDocs(q);
         setTopUsers(snap.docs.map(doc => doc.data() as UserProfile));
       } catch (error) {
         console.error("Error fetching leaderboard:", error);
+        try {
+          handleFirestoreError(error, OperationType.LIST, 'users');
+        } catch (e) {
+          // Keep failure logged but don't crash app
+        }
       }
     };
     fetchMiniLeaderboard();
-  }, []);
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (profile?.grade && !selectedGrade) {
@@ -628,7 +638,11 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                   {i === 0 && <span className="text-lg">👑</span>}
                 </div>
               ))}
-              {topUsers.length === 0 && <p className="text-center text-xs text-slate-400 py-4 italic">Đang tải bảng xếp hạng...</p>}
+              {topUsers.length === 0 && (
+                <p className="text-center text-xs text-slate-400 py-4 italic">
+                  {user ? "Đang tải bảng xếp hạng..." : "Đăng nhập để xem bảng vàng"}
+                </p>
+              )}
             </div>
           </div>
 

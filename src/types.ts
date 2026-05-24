@@ -43,6 +43,8 @@ export interface UserProfile {
   createdAt: number;
   lastSession?: PracticeConfig;
   membership?: 'regular' | 'diamond';
+  membershipExpiresAt?: number;
+  membershipActivatedAt?: number;
   role?: 'admin' | 'user';
 }
 

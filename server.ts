@@ -34,9 +34,10 @@ app.use((req, res, next) => {
 app.post("/api/generate-questions", async (req, res) => {
   const { grade, subject, topic, difficulty, count = 5, mode = "normal" } = req.body;
 
+  const isMockExam = mode === "mock_exam";
   // Simple key for cache lookup
   const cacheKey = `${grade}_${subject}_${topic || 'all'}_${difficulty}_${count}_${mode}`;
-  if (questionsCache.has(cacheKey)) {
+  if (!isMockExam && questionsCache.has(cacheKey)) {
     console.log(`[Cache Hit] Serving cached questions for key: ${cacheKey}`);
     return res.json(questionsCache.get(cacheKey));
   }
@@ -46,15 +47,18 @@ app.post("/api/generate-questions", async (req, res) => {
     const isVietnamese = subject === "Tiếng Việt";
     const isEnglish = subject === "Tiếng Anh" || subject === "English";
 
-    let prompt = `Bạn là một chuyên gia giáo dục tiểu học hàng đầu tại Việt Nam. 
-    Hãy tạo ra ${count} câu hỏi ôn tập cho học sinh Lớp ${grade}, môn ${subject}${topic ? `, chủ đề: "${topic}"` : ''}.
+    const randomSeed = Math.random().toString(36).substring(7);
+    let prompt = `Bạn là một chuyên gia giáo dục tiểu học hàng đầu tại Việt Nam. [Mã ngẫu nhiên đề thi: ${randomSeed}]
+    Hãy tạo ra ${count} câu hỏi ôn tập khác nhau, hoàn toàn độc đáo và đa dạng cho học sinh Lớp ${grade}, môn ${subject}${topic ? `, chủ đề: "${topic}"` : ''}.
+    Môn học này phải có các câu hỏi đa dạng và phong phú. Cấu trúc tổng thể của đề thi được duy trì chuẩn hóa nhưng nội dung câu hỏi, dữ liệu, các bài đọc thầm lý thú phải luôn thay đổi liên tục và đa dạng qua mỗi lần tạo để học sinh không bao giờ trùng lặp nội dung.
     Mô tả yêu cầu về độ khó: ${difficulty}.
     Chương trình: Kết nối tri thức và cuộc sống mới nhất.`;
 
     if (subject === "Toán") {
       prompt += `\n\nYÊU CẦU ĐẶC BIỆT CHO MÔN TOÁN:
       - KHÔNG ĐƯỢC phép thêm khoảng trắng (khoảng cách) để phân tách hàng nghìn trong bất kỳ số nào (Ví dụ: viết "1000", "25000" thay vì "1 000", "25 000").
-      - Tất cả các con số trong đề bài, đáp án lựa chọn, đáp án đúng và phần lời giải thích đều phải viết liền và không có khoảng trắng xen giữa các chữ số hàng nghìn.`;
+      - Tất cả các con số trong đề bài, đáp án lựa chọn, đáp án đúng và phần lời giải thích đều phải viết liền và không có khoảng trắng xen giữa các chữ số hàng nghìn.
+      - QUY TẮC PHÉP TOÁN NHÂN: Toàn bộ phép toán nhân phải sử dụng chữ cái "x" thay cho dấu sao "*". Ví dụ: viết "5 x 3 = 15" hoặc "5x3", tuyệt đối không dùng "5 * 3".`;
     }
 
     if (isVietnamese && isSemesterReview) {
@@ -79,6 +83,10 @@ app.post("/api/generate-questions", async (req, res) => {
       2. Mỗi câu hỏi cần có điểm số cụ thể (field: points) sao cho tổng điểm toàn bộ đề thi là 10.
       3. Nội dung ôn tập bám sát chương trình với các câu hỏi đa dạng, bao quát các mảng kiến thức cốt lõi.`;
     }
+
+    prompt += `\n\nQUY_TẮC HIỂN THỊ KHOẢNG TRỐNG:
+    - Tuyệt đối KHÔNG sử dụng ký tự cặp ngoặc vuông rỗng "[]" hay "[ ]" để đại diện cho khoảng trống điền từ trong câu hỏi.
+    - Trong mọi trường hợp cần biểu diễn ô trống, khoảng trống hoặc chỗ viết tiếp, phải bắt buộc dùng dấu ba chấm "..." để tạo sự cân đối và thẩm mỹ.`;
 
     prompt += `\n\nYêu cầu định dạng JSON chính xác:
     {
@@ -147,22 +155,27 @@ app.post("/api/generate-questions", async (req, res) => {
 
     const data = JSON.parse(response.text);
 
-    // Clean any thousands spaces between digits for Mathematics
+    // Clean any thousands spaces between digits and replace * multiplication with x for Mathematics
     if (subject === "Toán" && data.questions && Array.isArray(data.questions)) {
-      const cleanMathNumbers = (str: any): any => {
+      const cleanMathExpressions = (str: any): any => {
         if (typeof str !== "string") return str;
         // Strip out spaces specifically when placed between two digits (e.g., "1 000" -> "1000")
-        return str.replace(/(\d)\s+(\d)/g, "$1$2");
+        let cleanedStr = str.replace(/(\d)\s+(\d)/g, "$1$2");
+        // Replace multiplication * with x when it's between numbers or simple characters
+        cleanedStr = cleanedStr.replace(/(\d+)\s*\*\s*(\d+)/g, "$1 x $2");
+        cleanedStr = cleanedStr.replace(/(\d+)\s*\*\s*([A-Za-z]+)/gi, "$1 x $2");
+        cleanedStr = cleanedStr.replace(/([A-Za-z]+)\s*\*\s*(\d+)/gi, "$1 x $2");
+        return cleanedStr;
       };
 
       data.questions = data.questions.map((q: any) => {
         const cleaned: any = { ...q };
-        if (cleaned.questionText) cleaned.questionText = cleanMathNumbers(cleaned.questionText);
+        if (cleaned.questionText) cleaned.questionText = cleanMathExpressions(cleaned.questionText);
         if (Array.isArray(cleaned.options)) {
-          cleaned.options = cleaned.options.map((opt: any) => cleanMathNumbers(opt));
+          cleaned.options = cleaned.options.map((opt: any) => cleanMathExpressions(opt));
         }
-        if (cleaned.correctAnswer) cleaned.correctAnswer = cleanMathNumbers(cleaned.correctAnswer);
-        if (cleaned.explanation) cleaned.explanation = cleanMathNumbers(cleaned.explanation);
+        if (cleaned.correctAnswer) cleaned.correctAnswer = cleanMathExpressions(cleaned.correctAnswer);
+        if (cleaned.explanation) cleaned.explanation = cleanMathExpressions(cleaned.explanation);
         return cleaned;
       });
     }
@@ -234,6 +247,60 @@ app.post("/api/analyze-progress", async (req, res) => {
     console.error("Progress Analysis Error:", error);
     res.status(500).json({
       error: "Failed to analyze study progress",
+      details: error.message
+    });
+  }
+});
+
+// API: Analyze Weaknesses for Diamond Users
+app.post("/api/analyze-weaknesses", async (req, res) => {
+  const { subject, grade, topic, answersLog, score } = req.body;
+
+  try {
+    const prompt = `Bạn là một giáo viên chủ nhiệm tiểu học ấm áp và là Chuyên gia cố vấn học tập AI giàu kinh nghiệm bậc tiểu học tại Việt Nam.
+    Học sinh vừa hoàn thành bài luyện tập môn ${subject} Lớp ${grade} ${topic ? `, chuyên đề: "${topic}"` : ""}.
+    Kết quả đạt được: ${score}% (Nếu là thi thử, hãy chuyển đổi sang điểm số tương đương một cách thông minh).
+    Dưới đây là danh sách kết quả chi tiết từng câu hỏi (câu hỏi và trạng thái Đúng/Sai):
+    ${JSON.stringify(answersLog || [], null, 2)}
+
+    YÊU CẦU:
+    - Hãy phân tích và chỉ ra các mảng kiến thức chưa vững học sinh bị hổng hoặc mắc lỗi ở phần làm bài luyện đề này. VD: hổng kiến thức về bảng cửu chương, nhầm lẫn đặt câu ghép, hay phát âm sai từ vựng Tiếng Anh...
+    - Đồng thời đưa ra hướng dẫn, gợi ý ôn luyện bổ sung chi tiết để cải tiến.
+    - Giọng điệu khích lệ, gần gũi như thầy/cô trò chuyện với các em.
+
+    Yêu cầu định dạng JSON chính xác:
+    {
+      "summary": "Đoạn văn ngắn (2-3 câu) động viên con, khái quát phần thể hiện của con trong bài này.",
+      "weaknesses": ["Chỉ ra phần kiến thức cụ thể cần lưu ý, liên hệ trực tiếp với những câu con bị trả lời sai hoặc không chính xác."],
+      "recommendations": ["Phương án rèn luyện, bài học cần đọc thêm, hành động thực tế để bù đắp kiến thức."]
+    }`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            summary: { type: Type.STRING },
+            weaknesses: { type: Type.ARRAY, items: { type: Type.STRING } },
+            recommendations: { type: Type.ARRAY, items: { type: Type.STRING } }
+          },
+          required: ["summary", "weaknesses", "recommendations"]
+        }
+      }
+    });
+
+    if (!response.text) {
+      throw new Error("No response from Gemini");
+    }
+
+    res.json(JSON.parse(response.text));
+  } catch (error: any) {
+    console.error("Error analyzing weaknesses:", error);
+    res.status(500).json({
+      error: "Failed to analyze weaknesses",
       details: error.message
     });
   }

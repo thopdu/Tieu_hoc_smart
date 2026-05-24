@@ -4,22 +4,62 @@ import { Trophy, ArrowLeft, RotateCcw, Share2, Award, Check, Copy } from 'lucide
 import { Grade, Subject, PracticeConfig } from '../types';
 import { useAuth } from '../lib/AuthContext';
 import { addDoc, collection, doc, increment, updateDoc } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, OperationType, handleFirestoreError } from '../lib/firebase';
 
 interface ResultsViewProps {
   score: number;
   config: PracticeConfig;
+  answersLog?: any[];
   onRestart: () => void;
   onGoHome: () => void;
 }
 
-export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onRestart, onGoHome }) => {
-  const { user, refreshProfile } = useAuth();
+export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, answersLog, onRestart, onGoHome }) => {
+  const { user, profile, refreshProfile } = useAuth();
   const [saving, setSaving] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [copied, setCopied] = useState(false);
   const { grade, subject } = config;
   const hasSaved = React.useRef(false);
+
+  const [aiReport, setAiReport] = useState<{ summary: string; weaknesses: string[]; recommendations: string[] } | null>(null);
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [aiError, setAiError] = useState("");
+
+  const isDiamondUser = profile?.membership === 'diamond';
+
+  useEffect(() => {
+    if (!isDiamondUser || !user) return;
+
+    const fetchAIRecommendations = async () => {
+      setLoadingAI(true);
+      setAiError("");
+      try {
+        const resp = await fetch('/api/analyze-weaknesses', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            subject,
+            grade,
+            topic: config.topic || null,
+            answersLog: answersLog || [],
+            score
+          })
+        });
+
+        if (!resp.ok) throw new Error("Failed to load evaluation");
+        const data = await resp.json();
+        setAiReport(data);
+      } catch (err: any) {
+        console.error("AI Evaluation Error:", err);
+        setAiError("Không thể tải kết quả đánh giá học thuật từ AI.");
+      } finally {
+        setLoadingAI(false);
+      }
+    };
+
+    fetchAIRecommendations();
+  }, [user, answersLog, isDiamondUser, subject, grade, score]);
 
   const xpEarned = score * 10;
 
@@ -51,6 +91,11 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
         await refreshProfile();
       } catch (error) {
         console.error("Error saving results:", error);
+        try {
+          handleFirestoreError(error, OperationType.CREATE, 'results');
+        } catch (err) {
+          // Log but don't crash
+        }
       } finally {
         setSaving(false);
       }
@@ -67,7 +112,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
   };
 
   const shareUrl = window.location.origin || 'https://tieuhoc.giasuhongtrang.edu.vn/';
-  const shareText = `Tớ vừa đạt ${score}% điểm (${score * 10} XP) môn ${subject} Lớp ${grade}! Hãy cùng tớ tham gia thử thách ngay tại: ${shareUrl}`;
+  const shareText = config.mode === 'mock_exam'
+    ? `Tớ vừa đạt ${(score / 10).toFixed(1)}/10 điểm (${score * 10} XP) môn Thi thử ${subject} Lớp ${grade}! Hãy cùng tớ tham gia thử thách ngay tại: ${shareUrl}`
+    : `Tớ vừa đạt ${score}% điểm (${score * 10} XP) môn ${subject} Lớp ${grade}! Hãy cùng tớ tham gia thử thách ngay tại: ${shareUrl}`;
   const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
   const zaloShareUrl = `https://zalo.me/share?to=&utm_source=&utm_medium=&utm_campaign=&url=${encodeURIComponent(shareUrl)}`;
 
@@ -95,7 +142,9 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
         <div className="grid grid-cols-2 gap-3 md:gap-4 mb-4 md:mb-6">
           <div className="bg-blue-50 p-3 md:p-4 rounded-xl border border-blue-100 shadow-sm">
             <p className="text-blue-500 font-bold uppercase tracking-widest text-[8px] md:text-[10px] mb-1">Kết quả bài học</p>
-            <p className="text-2xl md:text-4xl font-black text-blue-900 font-display">{score}%</p>
+            <p className="text-2xl md:text-4xl font-black text-blue-900 font-display">
+              {config.mode === 'mock_exam' ? `${(score / 10).toFixed(1)}/10 điểm` : `${score}%`}
+            </p>
           </div>
           <div className="bg-yellow-50 p-3 md:p-4 rounded-xl border border-yellow-100 shadow-sm" >
             <p className="text-yellow-600 font-bold uppercase tracking-widest text-[8px] md:text-[10px] mb-1">XP Nhận được</p>
@@ -103,6 +152,74 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, onResta
           </div>
         </div>
  
+        {isDiamondUser && (
+          <div className="w-full text-left my-4 md:my-6">
+            {loadingAI && (
+              <div className="bg-gradient-to-br from-indigo-50 to-blue-50/50 p-5 rounded-2xl border border-indigo-100/60 shadow-inner flex flex-col items-center justify-center gap-3 animate-pulse py-8">
+                <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin" />
+                <p className="text-sm font-black text-indigo-900 font-display text-center">Trợ lý học tập AI đang đánh giá bài làm của con...</p>
+              </div>
+            )}
+
+            {aiError && (
+              <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold">
+                ⚠️ {aiError}
+              </div>
+            )}
+
+            {aiReport && (
+              <div className="bg-gradient-to-br from-indigo-50/30 via-slate-50/50 to-blue-50/20 rounded-2xl p-4 md:p-5 border border-indigo-100 text-left relative overflow-hidden shadow-xs">
+                {/* Glowing decorative indicator */}
+                <div className="absolute top-0 right-0 bg-yellow-400 text-indigo-950 font-black text-[9px] px-2.5 py-1 rounded-bl-xl uppercase tracking-wider flex items-center gap-1 font-display">
+                  💎 Diamond AI
+                </div>
+                
+                <h3 className="text-sm font-black text-indigo-950 flex items-center gap-1.5 uppercase mb-3.5 tracking-wide font-display">
+                  ✨ NHẬN XÉT SƯ PHẠM & BỔ SUNG KIẾN THỨC
+                </h3>
+                
+                {/* Summary */}
+                <p className="text-slate-700 text-xs sm:text-sm font-medium leading-relaxed mb-4 p-3 bg-white/70 rounded-xl border border-indigo-50 shadow-2xs">
+                  💭 {aiReport.summary}
+                </p>
+
+                {/* Two Columns Grid: Weakspots & Suggestions */}
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Weaknesses */}
+                  <div className="bg-white p-3 rounded-xl border border-rose-100 shadow-2xs">
+                    <h4 className="text-[11px] sm:text-xs font-black text-rose-800 uppercase mb-2 flex items-center gap-1 font-display">
+                      ❌ KIẾN THỨC CÒN YẾU (CẦN LƯU Ý)
+                    </h4>
+                    <ul className="space-y-1.5">
+                      {aiReport.weaknesses.map((w, index) => (
+                        <li key={index} className="text-xs text-rose-750 font-bold leading-relaxed flex items-start gap-1">
+                          <span className="shrink-0 text-rose-500 font-black">•</span>
+                          <span>{w}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Recommendations */}
+                  <div className="bg-white p-3 rounded-xl border border-emerald-100 shadow-2xs">
+                    <h4 className="text-[11px] sm:text-xs font-black text-emerald-800 uppercase mb-2 flex items-center gap-1 font-display">
+                      🚀 GIẢI PHÁP BỒI DƯỠNG THÊM
+                    </h4>
+                    <ul className="space-y-1.5">
+                      {aiReport.recommendations.map((r, index) => (
+                        <li key={index} className="text-xs text-emerald-700 font-bold leading-relaxed flex items-start gap-1">
+                          <span className="shrink-0 text-emerald-500 font-extrabold">✓</span>
+                          <span>{r}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex flex-row gap-3 justify-center items-center">
           <button 
             onClick={onRestart}

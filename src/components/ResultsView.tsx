@@ -111,7 +111,7 @@ export const ResultsView: React.FC<ResultsViewProps> = ({ score, config, answers
     return { title: "Cố gắng lên!", msg: "Đừng nản chí, hãy ôn tập lại và thử lại nhé!", icon: "💪" };
   };
 
-  const shareUrl = window.location.origin || 'https://tieuhoc.giasuhongtrang.edu.vn/';
+  const shareUrl = window.location.origin || 'https://vuihoctieuhoc.edu.vn/';
   const shareText = config.mode === 'mock_exam'
     ? `Tớ vừa đạt ${(score / 10).toFixed(1)}/10 điểm (${score * 10} XP) môn Thi thử ${subject} Lớp ${grade}! Hãy cùng tớ tham gia thử thách ngay tại: ${shareUrl}`
     : `Tớ vừa đạt ${score}% điểm (${score * 10} XP) môn ${subject} Lớp ${grade}! Hãy cùng tớ tham gia thử thách ngay tại: ${shareUrl}`;

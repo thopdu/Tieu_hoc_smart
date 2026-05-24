@@ -657,14 +657,14 @@ export const StudentProfile: React.FC = () => {
                   </h3>
                   
                   <p className="text-slate-300 font-medium text-sm mt-3 leading-relaxed">
-                    Ba mẹ ơi! Hãy kích hoạt <span className="text-cyan-400 font-bold">"Học viên Kim Cương"</span> để mở khóa toàn bộ các tính năng phân tích và đánh giá quá trình học tập con. Vui lòng liên hệ: 0941.38.28.35, Email: giasuhongtrang@gmail.com
+                    Ba mẹ ơi! Hãy kích hoạt <span className="text-cyan-400 font-bold">"Học viên Kim Cương"</span> để mở khóa toàn bộ các tính năng phân tích và đánh giá quá trình học tập con. Vui lòng liên hệ: 0941.38.28.35, Email: vuihoctieuhoc76@gmail.com
                   </p>
 
                   {/* Pricing and Activation Terms details with interactive upgrade button */}
                   <div className="mt-6 inline-flex flex-col items-center bg-indigo-950/60 border border-cyan-500/30 px-6 py-4 rounded-3xl shadow-xl backdrop-blur-sm mx-auto">
                     <span className="text-[10px] text-cyan-300 font-extrabold uppercase tracking-widest mb-1 font-display">🎁 Ưu đãi Phí Kích Hoạt</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-2xl sm:text-3xl font-black text-yellow-400 font-display">100.000 VNĐ</span>
+                      <span className="text-2xl sm:text-3xl font-black text-yellow-400 font-display">200.000 VNĐ</span>
                       <span className="text-xs text-slate-300 font-bold">/ năm</span>
                     </div>
                     <div className="flex items-center gap-1.5 mt-2.5 text-[11px] text-slate-200 font-semibold bg-cyan-950/50 px-3 py-1 rounded-full border border-cyan-900/30 mb-4">

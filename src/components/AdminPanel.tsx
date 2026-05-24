@@ -92,7 +92,7 @@ export const AdminPanel: React.FC = () => {
       setActionMessage({
         type: 'success',
         text: targetStatus === 'diamond'
-          ? `Đã kích hoạt KIM CƯƠNG thành công! (Phí kích hoạt: 100.000 VNĐ · Thời hạn: 1 năm)`
+          ? `Đã kích hoạt KIM CƯƠNG thành công! (Phí kích hoạt: 200.000 VNĐ · Thời hạn: 1 năm)`
           : 'Hạ xuống tài khoản THƯỜNG thành công.'
       });
 
@@ -374,7 +374,7 @@ export const AdminPanel: React.FC = () => {
                               <span>Hạ xuống thường</span>
                             ) : (
                               <>
-                                <Gem size={12} /> Kích hoạt Kim Cương (100k/năm)
+                                <Gem size={12} /> Kích hoạt Kim Cương (200k/năm)
                               </>
                             )}
                           </button>

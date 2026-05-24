@@ -194,7 +194,7 @@ function AppContent() {
 
       <footer className="bg-white border-t border-slate-100 py-5 px-6">
         <div className="max-w-7xl mx-auto text-center">
-          <p className="text-slate-400 text-sm font-medium">© 2026 Vui Học Tiểu Học (tieuhoc.giasuhongtrang.edu.vn). Đồng hành cùng học sinh lớp lá đến lớp 5.</p>
+          <p className="text-slate-400 text-sm font-medium">© 2026 Vui Học Tiểu Học (vuihoctieuhoc.edu.vn). Đồng hành cùng học sinh lớp lá đến lớp 5.</p>
         </div>
       </footer>
 

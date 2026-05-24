@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { BookText, Calculator, ChevronRight, GraduationCap, Trophy, Sparkles, Map, Search, X } from 'lucide-react';
+import { BookText, Calculator, ChevronRight, GraduationCap, Trophy, Sparkles, Map, Search, X, Calendar } from 'lucide-react';
 import { Grade, Subject, PracticeConfig, UserProfile, PracticeMode } from '../types';
 import { useAuth } from '../lib/AuthContext';
 import { collection, limit, orderBy, query, getDocs } from 'firebase/firestore';
 import { db, OperationType, handleFirestoreError } from '../lib/firebase';
+import { getWeeklyTopics } from '../lib/weeklyHomeworkData';
 
 interface PracticeInterfaceProps {
   onStart: (config: PracticeConfig) => void;
@@ -16,6 +17,8 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [topUsers, setTopUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeSegment, setActiveSegment] = useState<'weeks' | 'topics'>('weeks');
+  const [selectedSemester, setSelectedSemester] = useState<1 | 2>(1);
 
   useEffect(() => {
     // Reset subject when grade changes
@@ -490,48 +493,85 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                           <h3 className="font-bold text-slate-800 text-lg">Mục tiêu học tập môn {selectedSubject}:</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                           <button 
                             onClick={() => {
-                              const el = document.getElementById('topics-section');
-                              el?.scrollIntoView({ behavior: 'smooth' });
+                              setActiveSegment('weeks');
+                              setTimeout(() => {
+                                const el = document.getElementById('topics-section');
+                                el?.scrollIntoView({ behavior: 'smooth' });
+                              }, 100);
                             }}
-                            className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 hover:border-indigo-400 text-left shadow-sm flex items-center gap-3 group relative overflow-hidden cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">🎯</div>
-                            <span className="font-bold">Ôn tập theo chủ đề</span>
+                            <span className="absolute top-0 right-0 bg-rose-500 text-white font-extrabold text-[8px] px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Chọn lọc</span>
+                            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm shrink-0">📅</div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-indigo-950">Bài tập tuần (KNTT)</span>
+                              <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">35 Tuần chuẩn SGK</span>
+                            </div>
+                            <div className="absolute -right-2 -bottom-2 text-3xl opacity-10">🗓️</div>
+                          </button>
+
+                          <button 
+                            onClick={() => {
+                              setActiveSegment('topics');
+                              setTimeout(() => {
+                                const el = document.getElementById('topics-section');
+                                el?.scrollIntoView({ behavior: 'smooth' });
+                              }, 100);
+                            }}
+                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                          >
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-300 group-hover:text-blue-900 transition-colors shrink-0">🎯</div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800">Luyện tập Chuyên đề</span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Học theo kỹ năng</span>
+                            </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "midterm_review", "Ôn tập giữa kỳ I")}
-                            className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-emerald-500 hover:text-emerald-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-emerald-500 hover:text-emerald-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-colors">📝</div>
-                            <span className="font-bold">Ôn tập giữa kỳ I</span>
+                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-300 group-hover:text-emerald-900 transition-colors shrink-0">📝</div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800">Ôn tập giữa kỳ I</span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề giữa kỳ I</span>
+                            </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "final_review", "Ôn thi cuối kỳ I")}
-                            className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-indigo-500 hover:text-indigo-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-indigo-500 hover:text-indigo-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-500 group-hover:text-white transition-colors">🎓</div>
-                            <span className="font-bold">Ôn thi cuối kỳ I</span>
+                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-300 group-hover:text-indigo-900 transition-colors shrink-0">🎓</div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800">Ôn thi cuối kỳ I</span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề thi học kỳ I</span>
+                            </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "midterm_review", "Ôn tập giữa kỳ II")}
-                            className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-orange-500 hover:text-orange-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-orange-500 hover:text-orange-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-500 group-hover:text-white transition-colors">📚</div>
-                            <span className="font-bold">Ôn tập giữa kỳ II</span>
+                            <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-300 group-hover:text-orange-900 transition-colors shrink-0">📚</div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800">Ôn tập giữa kỳ II</span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề giữa kỳ II</span>
+                            </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "final_review", "Ôn thi cuối kỳ II")}
-                            className="p-4 rounded-2xl bg-white border border-slate-100 hover:border-pink-500 hover:text-pink-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-pink-500 hover:text-pink-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-pink-500 group-hover:bg-pink-500 group-hover:text-white transition-colors">🌟</div>
-                            <span className="font-bold">Ôn thi cuối kỳ II</span>
+                            <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-pink-500 group-hover:bg-pink-300 group-hover:text-pink-900 transition-colors shrink-0">🌟</div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-800">Ôn thi cuối kỳ II</span>
+                              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề thi học kỳ II</span>
+                            </div>
                           </button>
 
                           <button 
@@ -541,7 +581,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                             <div className="w-10 h-10 rounded-xl bg-yellow-500 flex items-center justify-center text-white shrink-0">⏰</div>
                             <div className="flex flex-col">
                               <span className="font-bold text-yellow-800">Thi thử học kỳ I</span>
-                              <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">60 Phút • Đề 20 câu</span>
+                              <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">60 Phút • 20 câu</span>
                             </div>
                             <div className="absolute -right-2 -bottom-2 text-3xl opacity-10">⏳</div>
                           </button>
@@ -553,7 +593,7 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                             <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center text-white shrink-0">⏰</div>
                             <div className="flex flex-col">
                               <span className="font-bold text-blue-800">Thi thử học kỳ II</span>
-                              <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">60 Phút • Đề 20 câu</span>
+                              <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">60 Phút • 20 câu</span>
                             </div>
                             <div className="absolute -right-2 -bottom-2 text-3xl opacity-10">⏳</div>
                           </button>
@@ -563,55 +603,183 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                   )}
                 </AnimatePresence>
 
-                {/* Topics Container */}
-                <div id="topics-section" className="space-y-12 pt-8">
-                  {/* Math/Vietnamese/English Topics Section */}
-                  <section>
-                    <div className="flex items-center justify-between mb-6 px-1">
-                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        {(!selectedSubject || selectedSubject === "Toán") && (
-                          <>
-                            <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
-                          </>
-                        )}
-                        {selectedSubject === "Tiếng Việt" && (
-                          <>
-                            <BookText size={14} className="text-blue-500" /> Tiếng Việt - Sách Kết nối tri thức
-                          </>
-                        )}
-                        {selectedSubject === "Tiếng Anh" && (
-                          <>
-                            <Sparkles size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
-                          </>
-                        )}
-                        {selectedSubject === "Tin học" && (
-                          <>
-                            <BookText size={14} className="text-teal-500" /> Tin học - Sách Kết nối tri thức
-                          </>
-                        )}
-                      </h3>
-                    </div>
-                    <div className="flex flex-wrap gap-2 md:gap-3">
-                      {getSubjectTopics(selectedGrade || 1, selectedSubject || "Toán").map((topic, i) => (
-                        <button 
-                          key={i}
-                          onClick={() => startTopic(selectedGrade || 1, selectedSubject || "Toán", topic)}
-                          className={`bg-white border border-slate-100 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-slate-600 transition-all shadow-sm text-sm md:text-base cursor-pointer ${
-                            (!selectedSubject || selectedSubject === "Toán")
-                              ? "hover:border-orange-500 hover:text-orange-600"
-                              : selectedSubject === "Tiếng Việt"
-                              ? "hover:border-blue-500 hover:text-blue-600"
-                              : selectedSubject === "Tiếng Anh"
-                              ? "hover:border-pink-500 hover:text-pink-600"
-                              : "hover:border-teal-500 hover:text-teal-600"
-                          }`}
-                        >
-                          {topic}
-                        </button>
-                      ))}
-                    </div>
-                  </section>
+                {/* Topics & Weekly Container */}
+                <div id="topics-section" className="space-y-8 pt-4">
+                  {/* Modern segment control tab switcher */}
+                  <div className="flex bg-slate-100 p-1.5 rounded-2xl max-w-md">
+                    <button
+                      onClick={() => setActiveSegment('weeks')}
+                      className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        activeSegment === 'weeks'
+                          ? 'bg-white text-indigo-950 shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Calendar size={16} />
+                      Bài tập tuần (KNTT)
+                    </button>
+                    <button
+                      onClick={() => setActiveSegment('topics')}
+                      className={`flex-1 py-3 px-4 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        activeSegment === 'topics'
+                          ? 'bg-white text-indigo-950 shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      <Sparkles size={16} />
+                      Luyện Chuyên đề
+                    </button>
+                  </div>
 
+                  {activeSegment === 'weeks' ? (
+                    <section className="space-y-6">
+                      <div className="flex items-center justify-between flex-wrap gap-4 px-1">
+                        <div>
+                          <h3 className="font-bold text-slate-800 text-xl font-display flex items-center gap-2">
+                            <span>📅</span> 35 Bài tập tuần bám sát SGK Kết nối tri thức
+                          </h3>
+                          <p className="text-slate-500 text-xs">Lộ trình rèn luyện tuần tự đầy đủ, chi tiết từ Bộ Giáo Dục.</p>
+                        </div>
+
+                        {/* Semester toggle */}
+                        <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl shrink-0">
+                          <button
+                            onClick={() => setSelectedSemester(1)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              selectedSemester === 1 ? 'bg-white text-indigo-950 shadow-sm' : 'text-slate-500'
+                            }`}
+                          >
+                            Học kỳ I (T1-18)
+                          </button>
+                          <button
+                            onClick={() => setSelectedSemester(2)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              selectedSemester === 2 ? 'bg-white text-indigo-950 shadow-sm' : 'text-slate-500'
+                            }`}
+                          >
+                            Học kỳ II (T19-35)
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Weeks list inside selected semester */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {getWeeklyTopics(selectedGrade || 1, selectedSubject || "Toán")
+                          .filter(t => t.semester === selectedSemester)
+                          .map((weekTopic) => {
+                            const isEnglish = (selectedSubject || "Toán") === "Tiếng Anh";
+                            const isVietnamese = (selectedSubject || "Toán") === "Tiếng Việt";
+                            const isMath = (selectedSubject || "Toán") === "Toán";
+                            const isInfo = (selectedSubject || "Toán") === "Tin học";
+
+                            const accentBg = isMath 
+                              ? 'border-orange-100 hover:border-orange-300 hover:bg-orange-50/20' 
+                              : isVietnamese 
+                              ? 'border-blue-100 hover:border-blue-300 hover:bg-blue-50/20' 
+                              : isEnglish 
+                              ? 'border-pink-100 hover:border-pink-300 hover:bg-pink-50/20' 
+                              : 'border-teal-100 hover:border-teal-300 hover:bg-teal-50/20';
+
+                            const badgeColor = isMath 
+                              ? 'bg-orange-100 text-orange-700' 
+                              : isVietnamese 
+                              ? 'bg-blue-100 text-blue-700' 
+                              : isEnglish 
+                              ? 'bg-pink-100 text-pink-700' 
+                              : 'bg-teal-100 text-teal-700';
+
+                            const btnStyle = isMath
+                              ? 'bg-orange-500 hover:bg-orange-600 text-white'
+                              : isVietnamese
+                              ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                              : isEnglish
+                              ? 'bg-pink-500 hover:bg-pink-600 text-white'
+                              : 'bg-teal-500 hover:bg-teal-600 text-white';
+
+                            return (
+                              <motion.div
+                                key={weekTopic.week}
+                                layoutId={`week-card-${weekTopic.week}`}
+                                className={`p-5 rounded-2xl bg-white border cursor-pointer transition-all flex flex-col justify-between gap-4 shadow-sm group ${accentBg}`}
+                                onClick={() => startTopic(selectedGrade || 1, selectedSubject || "Toán", weekTopic.title)}
+                              >
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className={`px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wider ${badgeColor}`}>
+                                      Tuần {weekTopic.week}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Học kỳ {weekTopic.semester}</span>
+                                  </div>
+                                  <h4 className="font-extrabold text-slate-800 text-base md:text-lg group-hover:text-indigo-950 transition-colors">
+                                    {weekTopic.title}
+                                  </h4>
+                                  <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed">
+                                    {weekTopic.description}
+                                  </p>
+                                </div>
+                                <div className="flex items-center justify-end pt-2 border-t border-slate-50">
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      startTopic(selectedGrade || 1, selectedSubject || "Toán", weekTopic.title);
+                                    }}
+                                    className={`py-2 px-4 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-all w-full justify-center sm:w-auto cursor-pointer ${btnStyle}`}
+                                  >
+                                    Luyện đề ngay <ChevronRight size={14} />
+                                  </button>
+                                </div>
+                              </motion.div>
+                            );
+                          })}
+                      </div>
+                    </section>
+                  ) : (
+                    <section className="space-y-6">
+                      <div className="flex items-center justify-between mb-4 px-1">
+                        <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                          {(!selectedSubject || selectedSubject === "Toán") && (
+                            <>
+                              <Calculator size={14} className="text-orange-500" /> Toán Chuyên Đề
+                            </>
+                          )}
+                          {selectedSubject === "Tiếng Việt" && (
+                            <>
+                              <BookText size={14} className="text-blue-500" /> Tiếng Việt - Sách Kết nối tri thức
+                            </>
+                          )}
+                          {selectedSubject === "Tiếng Anh" && (
+                            <>
+                              <Sparkles size={14} className="text-pink-500" /> Tiếng Anh Chuyên Đề
+                            </>
+                          )}
+                          {selectedSubject === "Tin học" && (
+                            <>
+                              <BookText size={14} className="text-teal-500" /> Tin học - Sách Kết nối tri thức
+                            </>
+                          )}
+                        </h3>
+                      </div>
+                      <div className="flex flex-wrap gap-2 md:gap-3">
+                        {getSubjectTopics(selectedGrade || 1, selectedSubject || "Toán").map((topic, i) => (
+                          <button 
+                            key={i}
+                            onClick={() => startTopic(selectedGrade || 1, selectedSubject || "Toán", topic)}
+                            className={`bg-white border border-slate-100 px-4 md:px-6 py-2.5 md:py-3 rounded-xl md:rounded-2xl font-bold text-slate-600 transition-all shadow-sm text-sm md:text-base cursor-pointer ${
+                              (!selectedSubject || selectedSubject === "Toán")
+                                ? "hover:border-orange-500 hover:text-orange-600"
+                                : selectedSubject === "Tiếng Việt"
+                                ? "hover:border-blue-500 hover:text-blue-600"
+                                : selectedSubject === "Tiếng Anh"
+                                ? "hover:border-pink-500 hover:text-pink-600"
+                                : "hover:border-teal-500 hover:text-teal-600"
+                            }`}
+                          >
+                            {topic}
+                          </button>
+                        ))}
+                      </div>
+                    </section>
+                  )}
                 </div>
               </motion.section>
             )}

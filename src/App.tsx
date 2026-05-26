@@ -55,7 +55,8 @@ function AppContent() {
           where('completedAt', '>=', startTimestamp)
         );
         const snap = await getDocs(q);
-        if (snap.size >= 2) {
+        if (snap.size >= 4) {
+          setView("profile");
           setShowLimitModal(true);
           setCheckingLimit(false);
           return;
@@ -167,7 +168,7 @@ function AppContent() {
               </h3>
               
               <p className="text-slate-500 text-sm leading-relaxed mb-5">
-                Ba mẹ ơi! Mỗi ngày tài khoản <strong className="text-slate-700">Học sinh thường</strong> chỉ được làm tối đa <strong className="text-blue-600">2 lượt luyện đề</strong> để tránh quá tải. Hãy nâng cấp lên tài khoản <strong className="text-indigo-600 font-extrabold">"KIM CƯƠNG"</strong> để con được luyện tập không giới hạn và nhận phân tích học tập AI chuyên sâu nhé!
+                Ba mẹ ơi! Mỗi ngày tài khoản <strong className="text-slate-700">Học sinh thường</strong> chỉ được làm tối đa <strong className="text-blue-600">4 lượt luyện đề</strong> để tránh quá tải. Hãy nâng cấp lên tài khoản <strong className="text-indigo-600 font-extrabold">"KIM CƯƠNG"</strong> để con được luyện tập không giới hạn và nhận phân tích học tập AI chuyên sâu nhé!
               </p>
               
               <div className="w-full space-y-2.5">

@@ -487,13 +487,13 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                       exit={{ opacity: 0, height: 0 }}
                       className="space-y-6 md:space-y-8"
                     >
-                      <div className="bg-white rounded-[2rem] p-6 md:p-8 border-2 border-dashed border-slate-100">
-                        <div className="flex items-center gap-2 mb-6">
-                          <Sparkles className="text-yellow-500" size={20} />
-                          <h3 className="font-bold text-slate-800 text-lg">Mục tiêu học tập môn {selectedSubject}:</h3>
+                      <div className="bg-white rounded-[2rem] p-5 md:p-6 border border-slate-150/80 shadow-xs">
+                        <div className="flex items-center gap-2 mb-5">
+                          <Sparkles className="text-yellow-500" size={18} />
+                          <h3 className="font-extrabold text-slate-800 text-base md:text-lg">Mục tiêu học tập môn {selectedSubject}:</h3>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                           <button 
                             onClick={() => {
                               setActiveSegment('weeks');
@@ -502,15 +502,15 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                                 el?.scrollIntoView({ behavior: 'smooth' });
                               }, 100);
                             }}
-                            className="p-4 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-200 hover:border-indigo-400 text-left shadow-sm flex items-center gap-3 group relative overflow-hidden cursor-pointer"
+                            className="p-3 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-indigo-100 hover:border-indigo-300 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group relative overflow-hidden cursor-pointer"
                           >
-                            <span className="absolute top-0 right-0 bg-rose-500 text-white font-extrabold text-[8px] px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">Chọn lọc</span>
-                            <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm shrink-0">📅</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-indigo-950">Bài tập tuần (KNTT)</span>
-                              <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider">35 Tuần chuẩn SGK</span>
+                            <span className="absolute top-0 right-0 bg-rose-500 text-white font-black text-[7px] px-1.5 py-0.5 rounded-bl-lg uppercase tracking-wider">Chọn lọc</span>
+                            <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-bold shadow-sm shrink-0">📅</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-indigo-950 truncate">Bài tập tuần (KNTT)</span>
+                              <span className="text-[10px] text-indigo-600 font-bold uppercase tracking-wider truncate">35 Tuần chuẩn SGK</span>
                             </div>
-                            <div className="absolute -right-2 -bottom-2 text-3xl opacity-10">🗓️</div>
+                            <div className="absolute -right-2 -bottom-2 text-2xl opacity-10">🗓️</div>
                           </button>
 
                           <button 
@@ -521,81 +521,81 @@ export const Dashboard: React.FC<PracticeInterfaceProps> = ({ onStart }) => {
                                 el?.scrollIntoView({ behavior: 'smooth' });
                               }, 100);
                             }}
-                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-blue-500 hover:text-blue-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-3 rounded-2xl bg-white border border-slate-150 hover:border-blue-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-300 group-hover:text-blue-900 transition-colors shrink-0">🎯</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800">Luyện tập Chuyên đề</span>
+                            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-300 group-hover:text-blue-900 transition-colors shrink-0 text-sm">🎯</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-slate-800">Luyện tập Chuyên đề</span>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Học theo kỹ năng</span>
                             </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "midterm_review", "Ôn tập giữa kỳ I")}
-                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-emerald-500 hover:text-emerald-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-3 rounded-2xl bg-white border border-slate-150 hover:border-emerald-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-300 group-hover:text-emerald-900 transition-colors shrink-0">📝</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800">Ôn tập giữa kỳ I</span>
+                            <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-300 group-hover:text-emerald-900 transition-colors shrink-0 text-sm">📝</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-slate-800">Ôn tập giữa kỳ I</span>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề giữa kỳ I</span>
                             </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "final_review", "Ôn thi cuối kỳ I")}
-                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-indigo-500 hover:text-indigo-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-3 rounded-2xl bg-white border border-slate-150 hover:border-indigo-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-300 group-hover:text-indigo-900 transition-colors shrink-0">🎓</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800">Ôn thi cuối kỳ I</span>
+                            <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-300 group-hover:text-indigo-900 transition-colors shrink-0 text-sm">🎓</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-slate-800">Ôn thi cuối kỳ I</span>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề thi học kỳ I</span>
                             </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "midterm_review", "Ôn tập giữa kỳ II")}
-                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-orange-500 hover:text-orange-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-3 rounded-2xl bg-white border border-slate-150 hover:border-orange-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-300 group-hover:text-orange-900 transition-colors shrink-0">📚</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800">Ôn tập giữa kỳ II</span>
+                            <div className="w-9 h-9 rounded-xl bg-orange-50 flex items-center justify-center text-orange-500 group-hover:bg-orange-300 group-hover:text-orange-900 transition-colors shrink-0 text-sm">📚</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-slate-800">Ôn tập giữa kỳ II</span>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề giữa kỳ II</span>
                             </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "final_review", "Ôn thi cuối kỳ II")}
-                            className="p-4 rounded-2xl bg-white border border-slate-150 hover:border-pink-500 hover:text-pink-600 transition-all text-left shadow-sm flex items-center gap-3 group cursor-pointer"
+                            className="p-3 rounded-2xl bg-white border border-slate-150 hover:border-pink-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center text-pink-500 group-hover:bg-pink-300 group-hover:text-pink-900 transition-colors shrink-0">🌟</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-slate-800">Ôn thi cuối kỳ II</span>
+                            <div className="w-9 h-9 rounded-xl bg-pink-50 flex items-center justify-center text-pink-500 group-hover:bg-pink-300 group-hover:text-pink-900 transition-colors shrink-0 text-sm">🌟</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-slate-800">Ôn thi cuối kỳ II</span>
                               <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Luyện đề thi học kỳ II</span>
                             </div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "mock_exam", "Thi thử học kỳ I", 60)}
-                            className="p-4 rounded-2xl bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200 hover:border-yellow-500 transition-all text-left shadow-sm flex items-center gap-3 group relative overflow-hidden cursor-pointer"
+                            className="p-3 rounded-2xl bg-gradient-to-br from-yellow-50 to-orange-50/40 border border-yellow-250 hover:border-yellow-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group relative overflow-hidden cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-yellow-500 flex items-center justify-center text-white shrink-0">⏰</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-yellow-800">Thi thử học kỳ I</span>
-                              <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider">60 Phút • 20 câu</span>
+                            <div className="w-9 h-9 rounded-xl bg-yellow-500 flex items-center justify-center text-white shrink-0 text-sm">⏰</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-yellow-800">Thi thử học kỳ I</span>
+                              <span className="text-[10px] text-yellow-600 font-bold uppercase tracking-wider font-mono">60 Phút • 20 câu</span>
                             </div>
-                            <div className="absolute -right-2 -bottom-2 text-3xl opacity-10">⏳</div>
+                            <div className="absolute -right-2 -bottom-2 text-2xl opacity-10">⏳</div>
                           </button>
 
                           <button 
                             onClick={() => startExam(selectedGrade, selectedSubject, "mock_exam", "Thi thử học kỳ II", 60)}
-                            className="p-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 hover:border-blue-500 transition-all text-left shadow-sm flex items-center gap-3 group relative overflow-hidden cursor-pointer"
+                            className="p-3 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50/40 border border-blue-250 hover:border-blue-500 hover:shadow-md transition-all text-left shadow-xs flex items-center gap-2.5 group relative overflow-hidden cursor-pointer"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center text-white shrink-0">⏰</div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-blue-800">Thi thử học kỳ II</span>
-                              <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider">60 Phút • 20 câu</span>
+                            <div className="w-9 h-9 rounded-xl bg-blue-500 flex items-center justify-center text-white shrink-0 text-sm">⏰</div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-extrabold text-xs md:text-sm text-blue-800">Thi thử học kỳ II</span>
+                              <span className="text-[10px] text-blue-600 font-bold uppercase tracking-wider font-mono">60 Phút • 20 câu</span>
                             </div>
-                            <div className="absolute -right-2 -bottom-2 text-3xl opacity-10">⏳</div>
+                            <div className="absolute -right-2 -bottom-2 text-2xl opacity-10">⏳</div>
                           </button>
                         </div>
                       </div>
